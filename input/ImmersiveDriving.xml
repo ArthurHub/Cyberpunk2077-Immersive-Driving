@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+  Immersive Driving input actions, merged into the game's input config by Input Loader.
+  Keyboard and mouse keys are rebound in-game: Mod Settings > Immersive Driving > Key Bindings.
+  The overridableUI names must match the EInputKey fields in scripts/Settings.reds.
+  Mod Settings applies its own defaults on top of these keys. Mouse wheel keys must not be defaults here: on patch 2.31
+  with Input Loader 0.1.1 they crash the game at startup, while applying them through Mod Settings works.
+-->
+<bindings>
+	<context name="ImmersiveDrivingActions">
+		<action name="ImmersiveDriving_CruiseToggle" map="ImmersiveDriving_CruiseToggle_Button" />
+		<action name="ImmersiveDriving_CruiseFaster" map="ImmersiveDriving_CruiseFaster_Button" />
+		<action name="ImmersiveDriving_CruiseSlower" map="ImmersiveDriving_CruiseSlower_Button" />
+		<action name="ImmersiveDriving_Gentle" map="ImmersiveDriving_Gentle_Button" />
+		<action name="ImmersiveDriving_Sport" map="ImmersiveDriving_Sport_Button" />
+	</context>
+
+	<!-- Driving, driving with the scanner open, and driving in combat. -->
+	<context name="VehicleDriveBase" append="true">
+		<include name="ImmersiveDrivingActions" />
+	</context>
+	<context name="VehicleDrive_QuickHackPanel" append="true">
+		<include name="ImmersiveDrivingActions" />
+	</context>
+	<context name="BaseVehicleDriverCombat" append="true">
+		<include name="ImmersiveDrivingActions" />
+	</context>
+
+	<acceptedEvents action="ImmersiveDriving_CruiseToggle">
+		<event name="BUTTON_PRESSED" />
+		<event name="BUTTON_RELEASED" />
+	</acceptedEvents>
+	<!-- No acceptedEvents for faster and slower, like the vanilla mouse wheel actions (NextWeapon, ZoomIn). -->
+	<acceptedEvents action="ImmersiveDriving_Gentle">
+		<event name="BUTTON_PRESSED" />
+		<event name="BUTTON_RELEASED" />
+	</acceptedEvents>
+	<acceptedEvents action="ImmersiveDriving_Sport">
+		<event name="BUTTON_PRESSED" />
+		<event name="BUTTON_RELEASED" />
+	</acceptedEvents>
+
+	<mapping name="ImmersiveDriving_CruiseToggle_Button" type="Button">
+		<button id="IK_Mouse5" overridableUI="immersiveDrivingCruiseToggle" />
+	</mapping>
+	<mapping name="ImmersiveDriving_CruiseFaster_Button" type="Button">
+		<button id="IK_PageUp" overridableUI="immersiveDrivingCruiseFaster" />
+	</mapping>
+	<mapping name="ImmersiveDriving_CruiseSlower_Button" type="Button">
+		<button id="IK_PageDown" overridableUI="immersiveDrivingCruiseSlower" />
+	</mapping>
+	<mapping name="ImmersiveDriving_Gentle_Button" type="Button">
+		<button id="IK_Alt" overridableUI="immersiveDrivingGentle" />
+	</mapping>
+	<mapping name="ImmersiveDriving_Sport_Button" type="Button">
+		<button id="IK_LShift" overridableUI="immersiveDrivingSport" />
+	</mapping>
+</bindings>

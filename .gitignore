@@ -1,0 +1,16 @@
+# Build output
+/build*/
+/dist/
+/out/
+
+# CMake user presets and IDE state
+CMakeUserPresets*.json
+.vs/
+.vscode/*
+!.vscode/settings.json
+*.user
+*.suo
+
+# Crash dumps and logs from local testing
+*.dmp
+*.log

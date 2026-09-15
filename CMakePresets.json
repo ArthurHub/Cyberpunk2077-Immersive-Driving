@@ -1,0 +1,43 @@
+{
+  "configurePresets": [
+    {
+      "binaryDir": "${sourceDir}/build",
+      "errors": {
+        "deprecated": true
+      },
+      "hidden": true,
+      "name": "cmake-dev",
+      "warnings": {
+        "deprecated": true,
+        "dev": true
+      }
+    },
+    {
+      "generator": "Visual Studio 17 2022",
+      "toolset": "v143",
+      "architecture": {
+        "value": "x64"
+      },
+      "hidden": true,
+      "name": "vs2022"
+    },
+    {
+      "generator": "Visual Studio 18 2026",
+      "toolset": "v145",
+      "architecture": {
+        "value": "x64"
+      },
+      "hidden": true,
+      "name": "vs2026"
+    },
+    {
+      "inherits": ["cmake-dev", "vs2026"],
+      "name": "default"
+    },
+    {
+      "inherits": ["cmake-dev", "vs2022"],
+      "name": "default-vs2022"
+    }
+  ],
+  "version": 3
+}
