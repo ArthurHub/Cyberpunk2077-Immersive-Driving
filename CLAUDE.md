@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Drive Modes and Cruise Control is a Cyberpunk 2077 (patch 2.31) mod: a RED4ext C++ plugin plus redscript. The user-visible name (Mod Settings menu, docs, Nexus page, log messages, version resource) is "Drive Modes and Cruise Control"; everything internal keeps the original working name `ImmersiveDriving` (DLL, plugin folder, input XML, script class prefix, natives, Mod Settings class and saved settings section), so renaming internals would break installs and saved settings. The GitHub repo is `ArthurHub/Cyberpunk2077-Immersive-Driving` (linked from `docs/nexus.md`). It shapes the player's keyboard driving inputs every tick (Default, Sport and Gentle levels for throttle, brake and steering, smooth and speed-sensitive steering) and adds cruise control that holds a set speed. Everything is configured in-game through Mod Settings, and the mod's keys come from an Input Loader XML. Inspired by Jo3yization's Immersive Driving (Nexus 5293), which only remaps input XML values.
+Drive Modes and Cruise Control is a Cyberpunk 2077 (patch 2.31) mod: a RED4ext C++ plugin plus redscript. The user-visible name (Mod Settings menu, docs, Nexus page, log messages, version resource) is "Drive Modes and Cruise Control"; everything internal keeps the original working name `ImmersiveDriving` (DLL, plugin folder, input XML, script class prefix, natives, Mod Settings class and saved settings section), so renaming internals would break installs and saved settings. The GitHub repo is `ArthurHub/Cyberpunk2077-Immersive-Driving` (linked from `docs/nexus.md`). It shapes the player's keyboard driving inputs every tick (Default, Sport and Gentle levels for throttle, brake and steering, smooth and speed-sensitive steering) and adds cruise control that holds a set speed and a speed limiter that caps it. Everything is configured in-game through Mod Settings, and the mod's keys come from an Input Loader XML. Inspired by Jo3yization's Immersive Driving (Nexus 5293), which only remaps input XML values.
 
 ## Build System
 
@@ -22,7 +22,7 @@ cmake --install build --config Release --prefix "<game dir>"   # install into th
 - `tools/package.ps1` builds, runs tests, installs to `dist/staging` and zips `dist/ImmersiveDriving-<version>.zip`.
 - The CRT is linked statically, so the DLL only depends on KERNEL32 and USER32.
 
-**No in-game automated tests.** `tests/CoreTests.cpp` covers the game-independent logic, including cruise control against a point-mass vehicle model. Anything touching the hook, natives or scripts needs a manual in-game check.
+**No in-game automated tests.** `tests/CoreTests.cpp` covers the game-independent logic, including cruise control and the speed limiter against a point-mass vehicle model. Anything touching the hook, natives or scripts needs a manual in-game check.
 
 ## Code Style
 
@@ -44,7 +44,7 @@ game per-tick input update ─────────────────�
 | Path | Role |
 | --- | --- |
 | `src/core/Config.*` | Every native tunable; `setBool/setFloat/setInt` by field name, clamped. Names match `scripts/Settings.reds`. |
-| `src/core/DriveController.*` | Pure logic: Default/Sport/Gentle levels (`*NormalPct` fields are the Default level) for throttle, brake and steering (Sport wins), steering ease-in, speed-sensitive steering, lean pairing fix, cruise PI controller, cancel rules, event queue. |
+| `src/core/DriveController.*` | Pure logic: Default/Sport/Gentle levels (`*NormalPct` fields are the Default level) for throttle, brake and steering (Sport wins), steering ease-in, speed-sensitive steering, lean pairing fix, cruise PI controller, cancel rules, event queue, speed limiter (the cruise controller as a throttle cap, with look-ahead, kickdown and a ramp down; mutually exclusive with cruise, kept by `reset(keepLimiter)`). |
 | `src/core/MathUtil.h` | Small math helpers and unit conversions. |
 | `src/plugin/Main.cpp` | RED4ext `Main`/`Query`/`Supports`. Registers natives, adds `scripts` to redscript compilation (relative to the DLL), attaches the hook. Runtime is 2.31 only. |
 | `src/plugin/VehicleHook.*` | Detour on `vehicle::BaseObject::UpdateVehicleCameraInput` (hash `501486464`). |
@@ -52,11 +52,11 @@ game per-tick input update ─────────────────�
 | `src/plugin/VehicleFunctions.*` | RTTI calls to `VehicleObject.GetCurrentSpeed` and `IsAutoDriveModeEnabled`. |
 | `src/plugin/Natives.*` | Global native functions for redscript; `scripts/Natives.reds` declares the same list. |
 | `scripts/Settings.reds` | Mod Settings class (all options and key bindings) and `Push()` to the plugin. |
-| `scripts/System.reds` | `ImmersiveDrivingSystem` (ScriptableSystem): player state machine listener, driver/vehicle tracking, driving restrictions, key handling, cruise commands, 10 Hz event poll, on-screen messages. |
-| `scripts/Speed.reds` | m/s to car dashboard/HUD speedometer/true km/h/true mph, bisection inverse for the speedometer curve, cruise speeds snapped to steps of 5. |
+| `scripts/System.reds` | `ImmersiveDrivingSystem` (ScriptableSystem): player state machine listener, driver/vehicle tracking, driving restrictions, key handling, cruise and speed limiter commands (set speed keys go to whichever is on), 10 Hz event poll, on-screen messages. |
+| `scripts/Speed.reds` | m/s to car dashboard/HUD speedometer/true km/h/true mph, bisection inverse for the speedometer curve, cruise speeds and limits snapped to steps of 5 (limits round the shown number up). |
 | `scripts/ModSettingsCompat.reds` | `@if(ModuleExists("ModSettingsModule"))` wrappers so the mod works without Mod Settings. |
 | `docs/` | `README.md` usage and configuration guide (every setting and default), `faq.md`, `changelog.md`, `nexus.md` (Nexus short description and BBCode page). Same layout as the author's F4VR mods; update them with user-visible changes. |
-| `input/ImmersiveDriving.xml` | Five button actions appended to `VehicleDriveBase`, `VehicleDrive_QuickHackPanel`, `BaseVehicleDriverCombat`. |
+| `input/ImmersiveDriving.xml` | Six button actions appended to `VehicleDriveBase`, `VehicleDrive_QuickHackPanel`, `BaseVehicleDriverCombat`. |
 
 ### Keeping names in sync
 
@@ -80,7 +80,7 @@ Game per-tick vehicle input update (patch 2.31, RVAs from `Cyberpunk2077.exe` 3.
 
 Driving input fields on `vehicle::BaseObject` (2.31): `0x264` Accelerate (0..1), `0x268` Decelerate (0..1), `0x26C` Handbrake (0..1), `0x270` accelerate minus decelerate, `0x274` second axis (tank/special mode), `0x278` TurnX steer (-1..1, positive right), `0x27C` LeanFB, `0x280` RockFB. Action CNames are FNV-1a 64 hashes (`Accelerate` = `0xc9e8ff04669cae10`, `TurnX` = `0x3ed85e372e5e12e6`). Because the game rewrites the block from scratch each tick, writing after the hook needs no restore, and the game never sees our values as history. The plugin keeps `0x270` consistent by applying the same pedal deltas, and writes `0x27C` for the lean pairing fix below. Let There Be Flight's SDK fork labels these 4 bytes later (older patch).
 
-The driving input function also forces values at the end (a vtable check that zeroes pedals and applies the handbrake, and an accelerate-quickhack path that forces full throttle). The scripts treat quickhacks, remote control and the `NoDriving`/`VehicleOnlyForward` player status effect tags as "driving not allowed", and the plugin checks AutoDrive every tick, so shaping and cruise control stay out of those states.
+The driving input function also forces values at the end (a vtable check that zeroes pedals and applies the handbrake, and an accelerate-quickhack path that forces full throttle). The scripts treat quickhacks, remote control and the `NoDriving`/`VehicleOnlyForward` player status effect tags as "driving not allowed", and the plugin checks AutoDrive every tick, so shaping and cruise control stay out of those states. The speed limiter waits through them instead of switching off, since it only lowers the throttle.
 
 ### Updating for a new game patch
 

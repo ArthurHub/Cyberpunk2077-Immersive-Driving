@@ -44,6 +44,10 @@ namespace immersive_driving
             { "cruiseCancelOnHandbrake", &Config::cruiseCancelOnHandbrake },
             { "cruiseCancelOnCollision", &Config::cruiseCancelOnCollision },
             { "cruiseUseBrakes", &Config::cruiseUseBrakes },
+            { "limiterEnabled", &Config::limiterEnabled },
+            { "limiterKeepOnExit", &Config::limiterKeepOnExit },
+            { "limiterKickdown", &Config::limiterKickdown },
+            { "limiterUseBrakes", &Config::limiterUseBrakes },
         };
 
         constexpr FloatField FLOAT_FIELDS[] = {
@@ -69,6 +73,7 @@ namespace immersive_driving
             { "cruiseMaxBrakePct", &Config::cruiseMaxBrakePct, 0, 100 },
             { "cruiseMaxThrottlePct", &Config::cruiseMaxThrottlePct, 5, 100 },
             { "cruiseResponsivenessPct", &Config::cruiseResponsivenessPct, 10, 300 },
+            { "limiterMaxBrakePct", &Config::limiterMaxBrakePct, 0, 100 },
         };
     }
 

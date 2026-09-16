@@ -1,10 +1,10 @@
 # Short description
 
-Calmer keyboard driving with Sport and Gentle modes for throttle, brake and steering, plus real cruise control that holds your speed on any road. Everything configurable in-game.
+Calmer keyboard driving with Sport and Gentle modes for throttle, brake and steering, plus real cruise control that holds your speed on any road and a speed limiter. Everything configurable in-game.
 
 # Full description
 
-[size=3]Keyboard driving in Night City is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and nothing keeps a steady speed. Drive Modes and Cruise Control shapes your driving inputs every frame, right before the car uses them. Throttle, brake and steering stay at calmer levels, a Sport key gives you everything when you need it, a Gentle key gives soft curves and careful parking, and cruise control measures your speed and adjusts throttle and brakes to actually hold it, on flat roads, uphill and downhill.[/size]
+[size=3]Keyboard driving in Night City is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and nothing keeps a steady speed. Drive Modes and Cruise Control shapes your driving inputs every frame, right before the car uses them. Throttle, brake and steering stay at calmer levels, a Sport key gives you everything when you need it, a Gentle key gives soft curves and careful parking, cruise control measures your speed and adjusts throttle and brakes to actually hold it, on flat roads, uphill and downhill, and a speed limiter keeps you under a limit you set.[/size]
 [size=3]
 Cruise down the highway at a steady 60 with the radio on, drift through a lane change with a light touch of the steering, and hold Sport the moment a chase starts. All configuration is done in-game and applied immediately, no reloads or restarts.[/size]
 
@@ -15,7 +15,8 @@ Cruise down the highway at a steady 60 with the radio on, drift through a lane c
 [*][size=3]Gentle: tap [b]Left Alt[/b] to switch soft throttle, brake and steering on and off, or hold it for a moment of Gentle.[/size]
 [*][size=3]While a mode is on, holding its key gives the Default levels until you let go. Prefer plain Hold or Toggle keys? Change them in Key Bindings.[/size]
 [*][size=3]Cruise control on / off: [b]Mouse 5[/b] (front thumb button).[/size]
-[*][size=3]Cruise speed up / down: [b]Page Up[/b] / [b]Page Down[/b], in steps of 5. While cruise control is off, speed up resumes the last cruise speed and speed down sets the current speed.[/size]
+[*][size=3]Speed limiter on / off: [b]Mouse 4[/b] (back thumb button). Hold [b]Left Shift[/b] to pass the limit.[/size]
+[*][size=3]Set speed up / down: [b]Page Up[/b] / [b]Page Down[/b], in steps of 5, for cruise control or the speed limiter, whichever is on. With both off, speed up resumes the last cruise speed and speed down sets the current speed.[/size]
 [*][size=3]Configure everything: [b]Mods > Drive Modes and Cruise Control[/b], from the main menu or the pause menu.[/size]
 [*][size=3]All keys can be rebound in Mod Settings. The mouse wheel works great for cruise speed.[/size]
 [/list]
@@ -44,16 +45,24 @@ Cruise down the highway at a steady 60 with the radio on, drift through a lane c
 [*][size=3]Speeds match your car's dashboard or the HUD speedometer, or use true km/h or mph.[/size]
 [*][size=3]Short on-screen messages and a click confirm every change, both optional.[/size]
 [/list]
+[size=3]Speed Limiter:[/size]
+[list]
+[*][size=3]Keeps the car from going faster than the limit: drive as usual, and the throttle eases off so the car settles on the limit instead of passing it.[/size]
+[*][size=3]Switches on at your current speed rounded up to a step of 5, so it never slows you down. Parked, it uses the last limit or a default limit you choose.[/size]
+[*][size=3]Hold the Sport key to pass the limit, and the car returns to the limit when you let go (can be turned off).[/size]
+[*][size=3]Brakes lightly downhill, and never switches off for braking or crashes.[/size]
+[*][size=3]Stays on when you get out and limits the next car you drive (can be turned off).[/size]
+[/list]
 [size=3]Configuration:[/size]
 [list]
 [*][size=3]Every value and key binding in Mod Settings, applied as soon as you accept, even while driving.[/size]
 [*][size=3]Cars and motorcycles can be switched on or off separately.[/size]
-[*][size=3]Controller friendly: levels apply to keyboard driving by default, cruise control works with any device.[/size]
+[*][size=3]Controller friendly: levels apply to keyboard driving by default, cruise control and the speed limiter work with any device.[/size]
 [/list]
 
 [size=4][b]Documentation[/b][/size]
 [list]
-[*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/README.md]Usage and Configuration Guide[/url] — drive modes, cruise control, speed units, and every setting with its default.[/size]
+[*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/README.md]Usage and Configuration Guide[/url] — drive modes, cruise control, the speed limiter, speed units, and every setting with its default.[/size]
 [*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/faq.md]FAQ and Troubleshooting[/url][/size]
 [*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/changelog.md]Changelog[/url][/size]
 [/list]

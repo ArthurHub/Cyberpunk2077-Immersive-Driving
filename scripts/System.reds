@@ -1,5 +1,5 @@
 // Connects the game to the native plugin: tracks when the player drives, forwards the mod's keys, runs cruise control
-// commands, and explains cruise control changes on screen.
+// and speed limiter commands, and explains their changes on screen.
 
 public class ImmersiveDrivingSystem extends ScriptableSystem {
 
@@ -30,6 +30,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     ImmersiveDriving_SetDrivingAllowed(false);
     this.ClearModes();
     ImmersiveDriving_ClearPlayerVehicle();
+    ImmersiveDriving_CancelLimiter();
 
     this.settings = new ImmersiveDrivingSettings();
     this.settings.system = this;
@@ -62,6 +63,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
 
     this.inputListener = ImmersiveDrivingInputListener.Create(this);
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseToggle");
+    player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_LimiterToggle");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseFaster");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseSlower");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_Gentle");
@@ -143,6 +145,10 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     if !Equals(vehicle.GetEntityID(), this.vehicleID) {
       this.vehicleID = vehicle.GetEntityID();
       ImmersiveDriving_SetPlayerVehicle(vehicle, ImmersiveDrivingSystem.GetVehicleKind(vehicle));
+      // A speed limiter that stayed on after leaving the last car is easy to forget.
+      if ImmersiveDriving_IsLimiterActive() {
+        this.Notify("Speed limiter " + this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()));
+      }
     }
 
     this.RefreshDrivingAllowed();
@@ -223,14 +229,19 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
           this.ToggleCruise();
         }
         break;
+      case n"ImmersiveDriving_LimiterToggle":
+        if ListenerAction.IsButtonJustPressed(action) {
+          this.ToggleLimiter();
+        }
+        break;
       case n"ImmersiveDriving_CruiseFaster":
         if ListenerAction.IsButtonJustPressed(action) {
-          this.StepCruise(1);
+          this.StepSetSpeed(1);
         }
         break;
       case n"ImmersiveDriving_CruiseSlower":
         if ListenerAction.IsButtonJustPressed(action) {
-          this.StepCruise(-1);
+          this.StepSetSpeed(-1);
         }
         break;
       case n"ImmersiveDriving_Gentle":
@@ -330,7 +341,8 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     ImmersiveDriving_SetGentle(false, false);
   }
 
-  // A mode that a toggle left on switches off when that key is changed to hold, which would never release it.
+  // A mode that a toggle left on switches off when that key is changed to hold, which would never release it. The plugin
+  // only notices a disabled speed limiter while driving, so a limiter left on after leaving the car is switched off here.
   public func OnSettingsChanged() -> Void {
     if Equals(this.GetKeyMode(true), ImmersiveDrivingKeyMode.Hold) {
       this.sportToggled = false;
@@ -339,10 +351,14 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
       this.gentleToggled = false;
     }
     this.PushModes();
+
+    if !this.settings.enabled || !this.settings.limiterEnabled {
+      ImmersiveDriving_CancelLimiter();
+    }
   }
 
   // -------------------------------------------------------------------------------------------------------------------
-  // Cruise control
+  // Cruise control and speed limiter. Only one of them is on at a time, the plugin switches the other one off.
 
   private func ToggleCruise() -> Void {
     if ImmersiveDriving_CancelCruise() {
@@ -353,17 +369,45 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     this.EngageCruise(ImmersiveDriving_GetSpeed());
   }
 
-  private func StepCruise(direction: Int32) -> Void {
-    if !ImmersiveDriving_IsCruiseActive() {
-      let lastTarget: Float = ImmersiveDriving_GetLastCruiseTarget();
-      this.EngageCruise(direction > 0 && lastTarget > 0.0 ? lastTarget : ImmersiveDriving_GetSpeed());
+  private func ToggleLimiter() -> Void {
+    if ImmersiveDriving_CancelLimiter() {
+      this.Notify("Speed limiter off");
+      this.PlayClick();
+      return;
+    }
+    this.EngageLimiter(this.GetLimiterStartSpeed());
+  }
+
+  // Set speed up and down change whichever of cruise control and the speed limiter is on. With both off they start the
+  // one chosen in Key Bindings: up at its last speed, down at the current speed.
+  private func StepSetSpeed(direction: Int32) -> Void {
+    let game: GameInstance = this.GetGameInstance();
+    if ImmersiveDriving_IsCruiseActive() {
+      let target: Float = this.SnapSpeed(ImmersiveDrivingSpeed.Step(game, this.settings.speedUnit, ImmersiveDriving_GetCruiseTarget(), direction));
+      if ImmersiveDriving_SetCruiseTarget(target) {
+        this.Notify("Cruise control " + this.FormatSpeed(ImmersiveDriving_GetCruiseTarget()));
+      }
+      return;
+    }
+    if ImmersiveDriving_IsLimiterActive() {
+      let limit: Float = this.SnapSpeed(ImmersiveDrivingSpeed.Step(game, this.settings.speedUnit, ImmersiveDriving_GetLimiterTarget(), direction));
+      if ImmersiveDriving_SetLimiterTarget(limit) {
+        this.Notify("Speed limiter " + this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()));
+      }
       return;
     }
 
-    let game: GameInstance = this.GetGameInstance();
-    let target: Float = this.SnapSpeed(ImmersiveDrivingSpeed.Step(game, this.settings.speedUnit, ImmersiveDriving_GetCruiseTarget(), direction));
-    if ImmersiveDriving_SetCruiseTarget(target) {
-      this.Notify("Cruise control " + this.FormatSpeed(ImmersiveDriving_GetCruiseTarget()));
+    let lastCruiseTarget: Float = ImmersiveDriving_GetLastCruiseTarget();
+    let lastLimit: Float = ImmersiveDriving_GetLastLimiterTarget();
+    switch this.settings.setSpeedKeys {
+      case ImmersiveDrivingSetSpeedKeys.StartCruise:
+        this.EngageCruise(direction > 0 && lastCruiseTarget > 0.0 ? lastCruiseTarget : ImmersiveDriving_GetSpeed());
+        break;
+      case ImmersiveDrivingSetSpeedKeys.StartLimiter:
+        this.EngageLimiter(direction > 0 && lastLimit > 0.0 ? lastLimit : this.GetLimiterStartSpeed());
+        break;
+      default:
+        break;
     }
   }
 
@@ -386,6 +430,41 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
         // Not driving (passenger, scene, AutoDrive, quickhack): stay silent.
         break;
     }
+  }
+
+  private func EngageLimiter(limit: Float) -> Void {
+    switch ImmersiveDriving_EngageLimiter(this.SnapSpeed(limit)) {
+      case 0:
+        this.Notify("Speed limiter " + this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()));
+        this.PlayClick();
+        break;
+      case 1:
+        this.Notify("Speed limiter is disabled in Mod Settings");
+        break;
+      case 4:
+        this.Notify("Drive Modes and Cruise Control is not ready, see red4ext/logs/ImmersiveDriving log");
+        break;
+      default:
+        // Not driving (passenger, scene, AutoDrive, quickhack): stay silent.
+        break;
+    }
+  }
+
+  // The current speed rounded up to a step of 5, so switching on never slows the car down. Below the minimum speed, for
+  // example parked, the last limit or else the default limit.
+  private func GetLimiterStartSpeed() -> Float {
+    let game: GameInstance = this.GetGameInstance();
+    let minSpeed: Float = this.settings.cruiseMinKmh / 3.6;
+    let speed: Float = ImmersiveDriving_GetSpeed();
+    if speed >= minSpeed {
+      return ImmersiveDrivingSpeed.SnapUp(game, this.settings.speedUnit, speed, minSpeed);
+    }
+
+    let lastLimit: Float = ImmersiveDriving_GetLastLimiterTarget();
+    if lastLimit > 0.0 {
+      return lastLimit;
+    }
+    return ImmersiveDrivingSpeed.SpeedShowing(game, this.settings.speedUnit, Cast<Float>(this.settings.limiterDefaultLimit));
   }
 
   private func ExplainCruiseEvent(event: Int32) -> Void {
@@ -417,7 +496,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private func SnapSpeed(speed: Float) -> Float {
     let snapped: Float = ImmersiveDrivingSpeed.Snap(this.GetGameInstance(), this.settings.speedUnit, speed, this.settings.cruiseMinKmh / 3.6);
     if this.settings.debugLogging {
-      ImmersiveDriving_Log("Cruise speed " + FloatToString(speed * 3.6) + " km/h shows " + FloatToString(ImmersiveDrivingSpeed.ToDisplay(this.GetGameInstance(), this.settings.speedUnit, speed)) + ", snapped to " + FloatToString(snapped * 3.6) + " km/h which shows " + FloatToString(ImmersiveDrivingSpeed.ToDisplay(this.GetGameInstance(), this.settings.speedUnit, snapped)));
+      ImmersiveDriving_Log("Set speed " + FloatToString(speed * 3.6) + " km/h shows " + FloatToString(ImmersiveDrivingSpeed.ToDisplay(this.GetGameInstance(), this.settings.speedUnit, speed)) + ", snapped to " + FloatToString(snapped * 3.6) + " km/h which shows " + FloatToString(ImmersiveDrivingSpeed.ToDisplay(this.GetGameInstance(), this.settings.speedUnit, snapped)));
     }
     return snapped;
   }

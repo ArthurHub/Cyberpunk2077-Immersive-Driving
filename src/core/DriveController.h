@@ -66,6 +66,8 @@ namespace immersive_driving
         // A mode key is physically down. A toggled mode stays active without it, and only a key that is really held can
         // be a vanilla lean key, so the lean pairing fix follows this and not the modes.
         bool modeKeyHeld = false;
+        // The Sport key itself is down, which lifts the speed limit (kickdown).
+        bool sportKeyHeld = false;
         // The player drives and nothing else (scene, autodrive, ...) owns the car.
         bool drivingAllowed = false;
         VehicleKind vehicleKind = VehicleKind::Unknown;
@@ -79,13 +81,16 @@ namespace immersive_driving
 
     /**
      * Turns the game's raw driving inputs into shaped ones: normal, Sport and Gentle levels for throttle, brake and steering,
-     * smooth and speed-sensitive steering, and cruise control. Speeds are in m/s.
+     * smooth and speed-sensitive steering, cruise control, and the speed limiter. Speeds are in m/s.
      */
     class DriveController
     {
     public:
         TickResult tick(const Config& config, const TickContext& context);
 
+        /**
+         * Engaging cruise control switches the speed limiter off, and the other way around.
+         */
         EngageResult engageCruise(const Config& config, float targetSpeed);
         bool setCruiseTarget(const Config& config, float targetSpeed);
 
@@ -97,15 +102,29 @@ namespace immersive_driving
         [[nodiscard]] bool isCruiseActive() const noexcept;
         [[nodiscard]] float getCruiseTarget() const noexcept;
         [[nodiscard]] float getLastCruiseTarget() const noexcept;
+
+        /**
+         * The limiter only ever lowers the throttle and adds brake, so it never switches itself off. While driving is not
+         * allowed it waits, and it is only switched off by the driver, the settings, or leaving the car (see reset).
+         */
+        EngageResult engageLimiter(const Config& config, float limit);
+        bool setLimiterTarget(const Config& config, float limit);
+        bool cancelLimiter() noexcept;
+
+        [[nodiscard]] bool isLimiterActive() const noexcept;
+        [[nodiscard]] float getLimiterTarget() const noexcept;
+        [[nodiscard]] float getLastLimiterTarget() const noexcept;
+
         [[nodiscard]] float getSpeed() const noexcept;
         [[nodiscard]] bool isAvailable() const noexcept;
 
         CruiseEvent popEvent() noexcept;
 
         /**
-         * Forgets everything tied to the current vehicle.
+         * Forgets everything tied to the current vehicle. The speed limiter stays on with keepLimiter, and the last limit is
+         * always kept because it belongs to the driver, not the vehicle.
          */
-        void reset() noexcept;
+        void reset(bool keepLimiter = false) noexcept;
 
     private:
         struct SpeedSample
@@ -127,11 +146,26 @@ namespace immersive_driving
             float slowTime = 0.0f;
         };
 
+        struct LimiterState
+        {
+            bool active = false;
+            bool braking = false;
+            float target = 0.0f;
+            // Follows the car down to the limit after kickdown or a lower limit. Above any real speed until the first tick.
+            float rampTarget = 0.0f;
+            // The throttle that holds the limit, learned while the limiter holds the car back.
+            float integral = 0.0f;
+            float brake = 0.0f;
+        };
+
         float shapeSteering(const Config& config, const TickContext& context, float input, float deltaTime, bool shape);
         void updateCruise(const Config& config, const TickContext& context, float deltaTime, DriveInputs& output);
+        void updateLimiter(const Config& config, const TickContext& context, float deltaTime, DriveInputs& output);
+        void startLimiter(float limit) noexcept;
 
         void recordSpeed(float speed) noexcept;
         [[nodiscard]] bool detectCollision() const noexcept;
+        [[nodiscard]] float estimateAcceleration() const noexcept;
         void pushEvent(CruiseEvent event) noexcept;
 
         float _throttle = 0.0f;
@@ -147,6 +181,10 @@ namespace immersive_driving
 
         CruiseState _cruise;
         float _lastCruiseTarget = 0.0f;
+
+        LimiterState _limiter;
+        float _lastLimiterTarget = 0.0f;
+        float _sportKeyHeldTime = 0.0f;
 
         std::array<CruiseEvent, 16> _events{};
         std::size_t _eventHead = 0;

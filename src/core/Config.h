@@ -56,6 +56,13 @@ namespace immersive_driving
         int cruiseMaxThrottlePct = 100;
         int cruiseResponsivenessPct = 100;
 
+        // Speed limiter. cruiseMinKmh is also the lowest limit.
+        bool limiterEnabled = true;
+        bool limiterKeepOnExit = true;
+        bool limiterKickdown = true;
+        bool limiterUseBrakes = true;
+        int limiterMaxBrakePct = 30;
+
         /**
          * Setters used by the native functions. Values are clamped to sane ranges.
          * They return false when the name is unknown for that type.

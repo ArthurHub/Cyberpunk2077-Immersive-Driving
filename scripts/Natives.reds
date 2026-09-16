@@ -35,6 +35,15 @@ public native func ImmersiveDriving_GetCruiseTarget() -> Float;
 public native func ImmersiveDriving_GetLastCruiseTarget() -> Float;
 public native func ImmersiveDriving_GetSpeed() -> Float;
 
+// Speed limiter. Engaging it switches cruise control off and the other way around. EngageLimiter returns the same codes
+// as EngageCruise (never too slow). It stays on after leaving the car when limiterKeepOnExit is set.
+public native func ImmersiveDriving_EngageLimiter(limit: Float) -> Int32;
+public native func ImmersiveDriving_SetLimiterTarget(limit: Float) -> Bool;
+public native func ImmersiveDriving_CancelLimiter() -> Bool;
+public native func ImmersiveDriving_IsLimiterActive() -> Bool;
+public native func ImmersiveDriving_GetLimiterTarget() -> Float;
+public native func ImmersiveDriving_GetLastLimiterTarget() -> Float;
+
 // Cruise changes the scripts did not request: 0 none, 1 target adopted after using the pedals, 2 cancelled by brake,
 // 3 by handbrake, 4 by a collision, 5 too slow, 6 unavailable (left the seat, scene, AutoDrive, disabled).
 public native func ImmersiveDriving_PopCruiseEvent() -> Int32;

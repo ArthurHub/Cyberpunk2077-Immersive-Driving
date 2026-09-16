@@ -96,6 +96,7 @@ namespace immersive_driving
         context.gentle = _gentle;
         context.sport = _sport;
         context.modeKeyHeld = _gentleKeyHeld || _sportKeyHeld;
+        context.sportKeyHeld = _sportKeyHeld;
         context.drivingAllowed = _drivingAllowed && !autoDrive && speedAvailable;
         context.vehicleKind = _vehicleKind;
 
@@ -153,7 +154,7 @@ namespace immersive_driving
         }
 
         if (instance != _playerVehiclePtr.load(std::memory_order_acquire)) {
-            _controller.reset();
+            _controller.reset(_config.limiterKeepOnExit);
             _lastTick = {};
             logger::info("Player is driving a vehicle (kind %d)", static_cast<int>(kind));
         }
@@ -173,7 +174,7 @@ namespace immersive_driving
         _playerVehiclePtr.store(nullptr, std::memory_order_release);
         _playerVehicle.Reset();
         _vehicleKind = VehicleKind::Unknown;
-        _controller.reset();
+        _controller.reset(_config.limiterKeepOnExit);
         _gentle = false;
         _sport = false;
         _gentleKeyHeld = false;
@@ -247,6 +248,45 @@ namespace immersive_driving
         return _controller.getLastCruiseTarget();
     }
 
+    EngageResult DrivingRuntime::engageLimiter(const float limit)
+    {
+        std::lock_guard lock(_mutex);
+        if (!isReady()) {
+            return EngageResult::NotReady;
+        }
+        return _controller.engageLimiter(_config, limit);
+    }
+
+    bool DrivingRuntime::setLimiterTarget(const float limit)
+    {
+        std::lock_guard lock(_mutex);
+        return _controller.setLimiterTarget(_config, limit);
+    }
+
+    bool DrivingRuntime::cancelLimiter()
+    {
+        std::lock_guard lock(_mutex);
+        return _controller.cancelLimiter();
+    }
+
+    bool DrivingRuntime::isLimiterActive()
+    {
+        std::lock_guard lock(_mutex);
+        return _controller.isLimiterActive();
+    }
+
+    float DrivingRuntime::getLimiterTarget()
+    {
+        std::lock_guard lock(_mutex);
+        return _controller.getLimiterTarget();
+    }
+
+    float DrivingRuntime::getLastLimiterTarget()
+    {
+        std::lock_guard lock(_mutex);
+        return _controller.getLastLimiterTarget();
+    }
+
     float DrivingRuntime::getSpeed()
     {
         std::lock_guard lock(_mutex);
@@ -272,7 +312,7 @@ namespace immersive_driving
         std::snprintf(buffer,
             sizeof(buffer),
             "Drive Modes and Cruise Control %s | hook %s, %llu player ticks | vehicle %s kind %d, driving %s%s, speed %s, %s | cruise %s target %.1f km/h | "
-            "game %.2f/%.2f/%.2f -> out %.2f/%.2f/%.2f",
+            "limiter %s %.1f km/h | game %.2f/%.2f/%.2f -> out %.2f/%.2f/%.2f",
             IMMERSIVE_DRIVING_VERSION_STRING,
             _hookInstalled.load() ? "installed" : "NOT installed",
             static_cast<unsigned long long>(_playerTicks.load()),
@@ -284,6 +324,8 @@ namespace immersive_driving
             _usingKeyboard ? "keyboard" : "gamepad",
             _controller.isCruiseActive() ? "on" : "off",
             mpsToKmh(_controller.getCruiseTarget()),
+            _controller.isLimiterActive() ? "on" : "off",
+            mpsToKmh(_controller.getLimiterTarget()),
             _lastGame.accelerate,
             _lastGame.decelerate,
             _lastGame.steer,
@@ -295,7 +337,7 @@ namespace immersive_driving
 
     void DrivingRuntime::logTick(const DriveInputs& game, const TickResult& result)
     {
-        logger::info("speed %.1f km/h | game %.2f/%.2f/%.2f lean %.2f -> out %.2f/%.2f/%.2f lean %.2f (%s) | gentle %d sport %d | cruise %s %.1f km/h",
+        logger::info("speed %.1f km/h | game %.2f/%.2f/%.2f lean %.2f -> out %.2f/%.2f/%.2f lean %.2f (%s) | gentle %d sport %d | cruise %s %.1f km/h | limiter %s %.1f km/h",
             mpsToKmh(_controller.getSpeed()),
             game.accelerate,
             game.decelerate,
@@ -309,6 +351,8 @@ namespace immersive_driving
             _gentle,
             _sport,
             _controller.isCruiseActive() ? "on" : "off",
-            mpsToKmh(_controller.getCruiseTarget()));
+            mpsToKmh(_controller.getCruiseTarget()),
+            _controller.isLimiterActive() ? "on" : "off",
+            mpsToKmh(_controller.getLimiterTarget()));
     }
 }

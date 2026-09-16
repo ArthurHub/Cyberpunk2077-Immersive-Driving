@@ -21,6 +21,13 @@ enum ImmersiveDrivingKeyMode {
   TapOrHold = 2
 }
 
+// What the set speed up and down keys do while cruise control and the speed limiter are both off.
+enum ImmersiveDrivingSetSpeedKeys {
+  StartCruise = 0,
+  StartLimiter = 1,
+  Nothing = 2
+}
+
 public class ImmersiveDrivingSettings extends IScriptable {
 
   // Told about changes that stay in the scripts (key modes). Not a Mod Settings option.
@@ -40,7 +47,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "General")
   @runtimeProperty("ModSettings.category.order", "0")
   @runtimeProperty("ModSettings.displayName", "Speed units")
-  @runtimeProperty("ModSettings.description", "Units for cruise control speeds, which are always whole steps of 5. Car dashboard matches the speed on the car's own display. HUD speedometer matches the third person speedometer, which follows the game's metric or imperial setting. Both use the game's speedometer numbers, which run higher than the true speed.")
+  @runtimeProperty("ModSettings.description", "Units for cruise control speeds and speed limits, which are always whole steps of 5. Car dashboard matches the speed on the car's own display. HUD speedometer matches the third person speedometer, which follows the game's metric or imperial setting. Both use the game's speedometer numbers, which run higher than the true speed.")
   @runtimeProperty("ModSettings.displayValues.Dashboard", "Car dashboard")
   @runtimeProperty("ModSettings.displayValues.HudSpeedometer", "HUD speedometer")
   @runtimeProperty("ModSettings.displayValues.Kmh", "True km/h")
@@ -50,15 +57,25 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "General")
   @runtimeProperty("ModSettings.category.order", "0")
+  @runtimeProperty("ModSettings.displayName", "Minimum speed (km/h)")
+  @runtimeProperty("ModSettings.description", "The lowest cruise speed and speed limit, as a true speed. Cruise control only switches on above it, and switches off when the car stays far below it, for example stuck in traffic. Below it the speed limiter key uses the last or default limit. 20 km/h is about 12 mph.")
+  @runtimeProperty("ModSettings.min", "5.0")
+  @runtimeProperty("ModSettings.max", "100.0")
+  @runtimeProperty("ModSettings.step", "5.0")
+  public let cruiseMinKmh: Float = 20.0;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "General")
+  @runtimeProperty("ModSettings.category.order", "0")
   @runtimeProperty("ModSettings.displayName", "Show messages")
-  @runtimeProperty("ModSettings.description", "Short on-screen messages when cruise control changes, or a toggle key switches a mode on or off.")
+  @runtimeProperty("ModSettings.description", "Short on-screen messages when cruise control or the speed limiter changes, or a toggle key switches a mode on or off.")
   public let showMessages: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "General")
   @runtimeProperty("ModSettings.category.order", "0")
   @runtimeProperty("ModSettings.displayName", "Play sounds")
-  @runtimeProperty("ModSettings.description", "A soft click when cruise control, or a mode on a toggle key, switches on or off.")
+  @runtimeProperty("ModSettings.description", "A soft click when cruise control, the speed limiter, or a mode on a toggle key switches on or off.")
   public let playSounds: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
@@ -249,17 +266,6 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Cruise Control")
   @runtimeProperty("ModSettings.category.order", "3")
-  @runtimeProperty("ModSettings.displayName", "Minimum speed (km/h)")
-  @runtimeProperty("ModSettings.description", "Cruise control only engages above this true speed, and switches off when the car stays far below it, for example stuck in traffic. 20 km/h is about 12 mph.")
-  @runtimeProperty("ModSettings.min", "5.0")
-  @runtimeProperty("ModSettings.max", "100.0")
-  @runtimeProperty("ModSettings.step", "5.0")
-  @runtimeProperty("ModSettings.dependency", "cruiseEnabled")
-  public let cruiseMinKmh: Float = 20.0;
-
-  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
-  @runtimeProperty("ModSettings.category", "Cruise Control")
-  @runtimeProperty("ModSettings.category.order", "3")
   @runtimeProperty("ModSettings.displayName", "Speed change rate (km/h per second)")
   @runtimeProperty("ModSettings.description", "How quickly the car speeds up or slows down to a new set speed.")
   @runtimeProperty("ModSettings.min", "1.0")
@@ -342,18 +348,73 @@ public class ImmersiveDrivingSettings extends IScriptable {
   public let cruiseMaxThrottlePct: Int32 = 100;
 
   // ---------------------------------------------------------------------------------------------------------------------
+  // Speed limiter
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Speed Limiter")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Enable speed limiter")
+  @runtimeProperty("ModSettings.description", "Keep the car from going faster than a set limit. Drive as usual, the throttle eases off at the limit. Limits are whole steps of 5 in the selected speed units. Switching the speed limiter on switches cruise control off, and the other way around.")
+  public let limiterEnabled: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Speed Limiter")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Default limit")
+  @runtimeProperty("ModSettings.description", "The limit in the selected speed units when the speed limiter key is pressed below the minimum speed, for example parked, before any limit was set since loading the game.")
+  @runtimeProperty("ModSettings.min", "10")
+  @runtimeProperty("ModSettings.max", "300")
+  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.dependency", "limiterEnabled")
+  public let limiterDefaultLimit: Int32 = 60;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Speed Limiter")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Stay on after leaving the car")
+  @runtimeProperty("ModSettings.description", "The speed limiter stays on when you get out, and limits the next car you drive. When off, leaving the driver seat switches it off. Loading a save always starts with it off.")
+  @runtimeProperty("ModSettings.dependency", "limiterEnabled")
+  public let limiterKeepOnExit: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Speed Limiter")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Sport key passes the limit")
+  @runtimeProperty("ModSettings.description", "Holding the Sport Mode key lifts the limit, for example to overtake. When you let go, the car slows back down to the limit. Sport mode switched on with a tap does not lift it.")
+  @runtimeProperty("ModSettings.dependency", "limiterEnabled")
+  public let limiterKickdown: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Speed Limiter")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Brake to stay at the limit")
+  @runtimeProperty("ModSettings.description", "Brake lightly downhill, after lowering the limit, or after passing it with the Sport key. When off, the car only coasts.")
+  @runtimeProperty("ModSettings.dependency", "limiterEnabled")
+  public let limiterUseBrakes: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Speed Limiter")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Maximum limiter braking (%)")
+  @runtimeProperty("ModSettings.min", "5")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.dependency", "limiterUseBrakes")
+  public let limiterMaxBrakePct: Int32 = 30;
+
+  // ---------------------------------------------------------------------------------------------------------------------
   // Key bindings. The names are the overridableUI names in input/ImmersiveDriving.xml.
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Sport Mode")
   @runtimeProperty("ModSettings.description", "Sport throttle, brake and steering levels, while held or switched on and off (see Sport Mode key).")
   public let immersiveDrivingSport: EInputKey = EInputKey.IK_LShift;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Sport Mode key")
   @runtimeProperty("ModSettings.description", "Hold: Sport mode while the key is held. Toggle: press to switch Sport mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Sport mode only while held, or default levels while held when Sport mode is on. A toggled mode also switches off when you leave the driver seat.")
   @runtimeProperty("ModSettings.displayValues.Hold", "Hold")
@@ -363,14 +424,14 @@ public class ImmersiveDrivingSettings extends IScriptable {
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Gentle Mode")
   @runtimeProperty("ModSettings.description", "Gentle throttle, brake and steering levels, while held or switched on and off (see Gentle Mode key).")
   public let immersiveDrivingGentle: EInputKey = EInputKey.IK_Alt;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Gentle Mode key")
   @runtimeProperty("ModSettings.description", "Hold: Gentle mode while the key is held. Toggle: press to switch Gentle mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Gentle mode only while held, or default levels while held when Gentle mode is on. A toggled mode also switches off when you leave the driver seat.")
   @runtimeProperty("ModSettings.displayValues.Hold", "Hold")
@@ -380,33 +441,50 @@ public class ImmersiveDrivingSettings extends IScriptable {
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Cruise control on / off")
-  @runtimeProperty("ModSettings.description", "Switch cruise control on at the current speed (rounded to a step of 5), or off.")
+  @runtimeProperty("ModSettings.description", "Switch cruise control on at the current speed (rounded to a step of 5), or off. Switches the speed limiter off.")
   public let immersiveDrivingCruiseToggle: EInputKey = EInputKey.IK_Mouse5;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
-  @runtimeProperty("ModSettings.displayName", "Cruise speed up")
-  @runtimeProperty("ModSettings.description", "Raise the cruise speed by 5. While cruise control is off, switch it back on at the last cruise speed.")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Speed limiter on / off")
+  @runtimeProperty("ModSettings.description", "Switch the speed limiter on at the current speed rounded up to a step of 5, or off. Below the minimum speed it uses the last limit, or the default limit. Switches cruise control off.")
+  public let immersiveDrivingLimiterToggle: EInputKey = EInputKey.IK_Mouse4;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Key Bindings")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Set speed up")
+  @runtimeProperty("ModSettings.description", "Raise the cruise speed or the speed limit by 5, whichever is on. With both off, see Set speed keys.")
   public let immersiveDrivingCruiseFaster: EInputKey = EInputKey.IK_PageUp;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
-  @runtimeProperty("ModSettings.category.order", "4")
-  @runtimeProperty("ModSettings.displayName", "Cruise speed down")
-  @runtimeProperty("ModSettings.description", "Lower the cruise speed by 5. While cruise control is off, switch it on at the current speed (rounded to a step of 5).")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Set speed down")
+  @runtimeProperty("ModSettings.description", "Lower the cruise speed or the speed limit by 5, whichever is on. With both off, see Set speed keys.")
   public let immersiveDrivingCruiseSlower: EInputKey = EInputKey.IK_PageDown;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Key Bindings")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Set speed keys")
+  @runtimeProperty("ModSettings.description", "What set speed up and down do while cruise control and the speed limiter are both off. Start cruise control: up switches it back on at the last cruise speed, down at the current speed. Start speed limiter: up switches it back on at the last limit, down at the current speed rounded up. Do nothing: they only change a speed that is already on.")
+  @runtimeProperty("ModSettings.displayValues.StartCruise", "Start cruise control")
+  @runtimeProperty("ModSettings.displayValues.StartLimiter", "Start speed limiter")
+  @runtimeProperty("ModSettings.displayValues.Nothing", "Do nothing")
+  public let setSpeedKeys: ImmersiveDrivingSetSpeedKeys = ImmersiveDrivingSetSpeedKeys.StartCruise;
 
   // ---------------------------------------------------------------------------------------------------------------------
   // Advanced
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Advanced")
-  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.category.order", "6")
   @runtimeProperty("ModSettings.displayName", "Debug logging")
-  @runtimeProperty("ModSettings.description", "Write driving values to red4ext/logs/ImmersiveDriving-*.log once per second, plus the mod's key presses and cruise control speed changes.")
+  @runtimeProperty("ModSettings.description", "Write driving values to red4ext/logs/ImmersiveDriving-*.log once per second, plus the mod's key presses and cruise control and speed limiter speed changes.")
   public let debugLogging: Bool = false;
 
   public func OnModSettingsChange() -> Void {
@@ -452,5 +530,11 @@ public class ImmersiveDrivingSettings extends IScriptable {
     ImmersiveDriving_SetBool(n"cruiseUseBrakes", this.cruiseUseBrakes);
     ImmersiveDriving_SetInt(n"cruiseMaxBrakePct", this.cruiseMaxBrakePct);
     ImmersiveDriving_SetInt(n"cruiseMaxThrottlePct", this.cruiseMaxThrottlePct);
+
+    ImmersiveDriving_SetBool(n"limiterEnabled", this.limiterEnabled);
+    ImmersiveDriving_SetBool(n"limiterKeepOnExit", this.limiterKeepOnExit);
+    ImmersiveDriving_SetBool(n"limiterKickdown", this.limiterKickdown);
+    ImmersiveDriving_SetBool(n"limiterUseBrakes", this.limiterUseBrakes);
+    ImmersiveDriving_SetInt(n"limiterMaxBrakePct", this.limiterMaxBrakePct);
   }
 }

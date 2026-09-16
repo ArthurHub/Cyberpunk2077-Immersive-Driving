@@ -224,6 +224,66 @@ namespace immersive_driving::natives
             }
         }
 
+        void engageLimiter(Context*, Frame* frame, int32_t* out, int64_t)
+        {
+            float limit = 0.0f;
+            RED4ext::GetParameter(frame, &limit);
+            frame->code++;
+
+            const auto result = DrivingRuntime::get().engageLimiter(limit);
+            if (out) {
+                *out = static_cast<int32_t>(result);
+            }
+        }
+
+        void setLimiterTarget(Context*, Frame* frame, bool* out, int64_t)
+        {
+            float limit = 0.0f;
+            RED4ext::GetParameter(frame, &limit);
+            frame->code++;
+
+            const bool changed = DrivingRuntime::get().setLimiterTarget(limit);
+            if (out) {
+                *out = changed;
+            }
+        }
+
+        void cancelLimiter(Context*, Frame* frame, bool* out, int64_t)
+        {
+            frame->code++;
+            const bool wasActive = DrivingRuntime::get().cancelLimiter();
+            if (out) {
+                *out = wasActive;
+            }
+        }
+
+        void isLimiterActive(Context*, Frame* frame, bool* out, int64_t)
+        {
+            frame->code++;
+            const bool active = DrivingRuntime::get().isLimiterActive();
+            if (out) {
+                *out = active;
+            }
+        }
+
+        void getLimiterTarget(Context*, Frame* frame, float* out, int64_t)
+        {
+            frame->code++;
+            const float target = DrivingRuntime::get().getLimiterTarget();
+            if (out) {
+                *out = target;
+            }
+        }
+
+        void getLastLimiterTarget(Context*, Frame* frame, float* out, int64_t)
+        {
+            frame->code++;
+            const float target = DrivingRuntime::get().getLastLimiterTarget();
+            if (out) {
+                *out = target;
+            }
+        }
+
         void getSpeed(Context*, Frame* frame, float* out, int64_t)
         {
             frame->code++;
@@ -285,6 +345,12 @@ namespace immersive_driving::natives
             registerGlobal(rtti, "ImmersiveDriving_IsCruiseActive", &isCruiseActive, "Bool", {});
             registerGlobal(rtti, "ImmersiveDriving_GetCruiseTarget", &getCruiseTarget, "Float", {});
             registerGlobal(rtti, "ImmersiveDriving_GetLastCruiseTarget", &getLastCruiseTarget, "Float", {});
+            registerGlobal(rtti, "ImmersiveDriving_EngageLimiter", &engageLimiter, "Int32", { { "Float", "limit" } });
+            registerGlobal(rtti, "ImmersiveDriving_SetLimiterTarget", &setLimiterTarget, "Bool", { { "Float", "limit" } });
+            registerGlobal(rtti, "ImmersiveDriving_CancelLimiter", &cancelLimiter, "Bool", {});
+            registerGlobal(rtti, "ImmersiveDriving_IsLimiterActive", &isLimiterActive, "Bool", {});
+            registerGlobal(rtti, "ImmersiveDriving_GetLimiterTarget", &getLimiterTarget, "Float", {});
+            registerGlobal(rtti, "ImmersiveDriving_GetLastLimiterTarget", &getLastLimiterTarget, "Float", {});
             registerGlobal(rtti, "ImmersiveDriving_GetSpeed", &getSpeed, "Float", {});
             registerGlobal(rtti, "ImmersiveDriving_PopCruiseEvent", &popCruiseEvent, "Int32", {});
 

@@ -1,6 +1,6 @@
 # Usage and Configuration Guide
 
-Keyboard driving in Cyberpunk 2077 is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and nothing keeps a steady speed. Drive Modes and Cruise Control shapes those inputs every frame before the car receives them. Throttle, brake and steering stay at calmer levels, a Sport key gives you everything when you need it, a Gentle key gives soft curves and careful parking, and cruise control holds the speed you set on flat roads, uphill and downhill. Everything is configured in-game and applied as soon as you accept the change.
+Keyboard driving in Cyberpunk 2077 is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and nothing keeps a steady speed. Drive Modes and Cruise Control shapes those inputs every frame before the car receives them. Throttle, brake and steering stay at calmer levels, a Sport key gives you everything when you need it, a Gentle key gives soft curves and careful parking, cruise control holds the speed you set on flat roads, uphill and downhill, and a speed limiter keeps you under a limit you set. Everything is configured in-game and applied as soon as you accept the change.
 
 Cruise down the highway at a steady 60 with the radio on, drift through a lane change with a light touch of the steering, and hold Sport the moment a chase starts.
 
@@ -13,6 +13,7 @@ For installation, requirements, and credits see the [main README](../README.md).
 - [Default Key Bindings](#default-key-bindings)
 - [Steering](#steering)
 - [Cruise Control](#cruise-control)
+- [Speed Limiter](#speed-limiter)
 - [Speed Units](#speed-units)
 - [Keyboard, Controller and Motorcycles](#keyboard-controller-and-motorcycles)
 - [In-Game Configuration](#in-game-configuration)
@@ -72,11 +73,12 @@ Rebind the keys in **Mods > Drive Modes and Cruise Control > Key Bindings**, fro
 | --- | --- | --- |
 | Sport Mode | Left Shift | Tap to switch the Sport throttle, brake and steering levels on and off, or hold for them while held |
 | Gentle Mode | Left Alt | Tap to switch the Gentle throttle, brake and steering levels on and off, or hold for them while held |
-| Cruise control on / off | Mouse 5 (front thumb button) | Switches cruise control on at the current speed, or off |
-| Cruise speed up | Page Up | Raises the cruise speed by 5. While cruise control is off, switches it back on at the last cruise speed |
-| Cruise speed down | Page Down | Lowers the cruise speed by 5. While cruise control is off, switches it on at the current speed |
+| Cruise control on / off | Mouse 5 (front thumb button) | Switches cruise control on at the current speed, or off. Switches the speed limiter off |
+| Speed limiter on / off | Mouse 4 (back thumb button) | Switches the speed limiter on at the current speed rounded up, or off. Switches cruise control off |
+| Set speed up | Page Up | Raises the cruise speed or the speed limit by 5, whichever is on. With both off, switches cruise control back on at the last cruise speed |
+| Set speed down | Page Down | Lowers the cruise speed or the speed limit by 5, whichever is on. With both off, switches cruise control on at the current speed |
 
-Whether the Sport and Gentle keys are held, toggled, or both is set by *Sport Mode key* and *Gentle Mode key* (Tap or hold by default), see [Mode Keys](#mode-keys-hold-toggle-or-tap-or-hold). The keys only do something while you drive. The mouse wheel works well for cruise speed up and down, but it also zooms the vehicle camera in the vanilla game.
+Whether the Sport and Gentle keys are held, toggled, or both is set by *Sport Mode key* and *Gentle Mode key* (Tap or hold by default), see [Mode Keys](#mode-keys-hold-toggle-or-tap-or-hold). With cruise control and the speed limiter both off, *Set speed keys* can make set speed up and down start the speed limiter instead, or do nothing. The keys only do something while you drive. The mouse wheel works well for set speed up and down, but it also zooms the vehicle camera in the vanilla game.
 
 ## Steering
 
@@ -88,19 +90,35 @@ All speeds in these settings are true speeds in km/h (40 km/h is about 25 mph, 1
 ## Cruise Control
 
 - **Switch it on** with the cruise key above the minimum speed (20 km/h by default). The cruise speed is your current speed rounded to a step of 5, for example 57 becomes 55.
-- **Change the speed** with cruise speed up and down, always in steps of 5 (50, 55, 60). The car speeds up or slows down smoothly at the speed change rate.
+- **Change the speed** with set speed up and down, always in steps of 5 (50, 55, 60). The car speeds up or slows down smoothly at the speed change rate.
 - **Accelerating** always works. When you let go, cruise control returns to the cruise speed, like a real car. With *After using the pedals* set to *Use new speed*, the speed you let go at (rounded to 5) becomes the new cruise speed.
 - **Braking** switches cruise control off. With *Brake cancels cruise control* off, braking only pauses it until you let go of the brake.
 - It also switches off for the **handbrake**, a **sudden impact**, staying **far below the minimum speed** (stuck in traffic), **leaving the driver seat**, **scenes**, **AutoDrive**, and vehicle **quickhacks** or **remote control**.
 - It **brakes lightly** downhill or after lowering the cruise speed so the car does not run away, up to the maximum cruise braking. Turn *Brake to hold speed* off to only coast.
 - Steering, the Sport and Gentle keys, and the horn keep working while cruising.
+- Switching cruise control on switches the [speed limiter](#speed-limiter) off.
 - A short on-screen message and a click confirm each change. Both can be turned off.
 
 Cruise control works with keyboard and controller alike.
 
+## Speed Limiter
+
+The speed limiter keeps the car from going faster than a limit you set. Drive as usual: below the limit the throttle is yours, and close to it the throttle eases off, so the car settles on the limit instead of passing it.
+
+- **Switch it on** with the speed limiter key. The limit is your current speed rounded up to a step of 5, so switching it on never slows you down: 57 becomes 60, and 60 stays 60. Below the minimum speed, for example parked, it uses the last limit, or the *Default limit* (60) if you have not set one since loading the game.
+- **Change the limit** with set speed up and down, in steps of 5. A limit below your speed slows the car down smoothly.
+- **Pass the limit** by holding the **Sport Mode key**, for example to overtake. When you let go, the car slows back down to the limit. Sport mode switched on with a tap does not lift the limit. Turn off *Sport key passes the limit* for a strict limit.
+- **Braking, the handbrake and crashes** leave it on, since it only ever holds the throttle back. During scenes, AutoDrive, vehicle quickhacks and remote control it waits, and it carries on afterwards.
+- It **brakes lightly** downhill, after lowering the limit, and after passing it with the Sport key, up to the maximum limiter braking. Turn *Brake to stay at the limit* off to only coast.
+- It **stays on when you leave the car** and limits the next car you drive, with a short reminder when you get in. Turn off *Stay on after leaving the car* to switch it off when you leave the driver seat. Loading a save always starts with it off.
+- Switching the speed limiter on switches cruise control off, and the other way around.
+- A short on-screen message and a click confirm each change. Both can be turned off.
+
+The speed limiter works with keyboard and controller alike.
+
 ## Speed Units
 
-The game's speedometers show a number that runs well above the true speed, and cruise control uses the number you actually see. Pick the one that matches the display you read in **General > Speed units**:
+The game's speedometers show a number that runs well above the true speed, and cruise control and the speed limiter use the number you actually see. Pick the one that matches the display you read in **General > Speed units**:
 
 - **Car dashboard** (default) — the display inside the car. It shows the same number whatever the game's metric or imperial setting.
 - **HUD speedometer** — the third person speedometer, which follows the game's *Speedometer units* setting.
@@ -108,7 +126,7 @@ The game's speedometers show a number that runs well above the true speed, and c
 
 ## Keyboard, Controller and Motorcycles
 
-- **Keyboard only by default.** Triggers and sticks are already analog, so throttle, brake and steering levels only apply to keyboard driving. Turn on *Shape controller input too* to apply them to a controller as well. Cruise control works with any device.
+- **Keyboard only by default.** Triggers and sticks are already analog, so throttle, brake and steering levels only apply to keyboard driving. Turn on *Shape controller input too* to apply them to a controller as well. Cruise control and the speed limiter work with any device.
 - **Controller buttons** can't be rebound in Mod Settings. To use one, add a `<button id="IK_Pad_..."/>` line to the matching mapping in `r6/input/ImmersiveDriving.xml`.
 - **Motorcycles** are supported, and can be switched off separately from cars.
 - **Lean keys.** In the vanilla game Left Shift and Left Ctrl lean forward and back (motorcycles, and cars in the air), and the game scales steering down while a lean key is held. While the Sport or Gentle key is held on the keyboard, the mod restores full steering and drops that lean, so Sport on Left Shift steers fully and does not lean. A mode switched on with a toggle key leaves leaning alone once the key is released.
@@ -124,9 +142,10 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | Enable Drive Modes and Cruise Control | On | Master switch. When off, driving is completely vanilla. |
-| Speed units | Car dashboard | Units for cruise control speeds, see [Speed Units](#speed-units). |
-| Show messages | On | Short on-screen messages when cruise control changes, or a toggle key switches a mode on or off. |
-| Play sounds | On | A soft click when cruise control, or a mode on a toggle key, switches on or off. |
+| Speed units | Car dashboard | Units for cruise control speeds and speed limits, see [Speed Units](#speed-units). |
+| Minimum speed | 20 km/h | The lowest cruise speed and speed limit, as a true speed. Cruise control only switches on above it, and switches off when the car stays far below it. Below it the speed limiter key uses the last or default limit. |
+| Show messages | On | Short on-screen messages when cruise control or the speed limiter changes, or a toggle key switches a mode on or off. |
+| Play sounds | On | A soft click when cruise control, the speed limiter, or a mode on a toggle key switches on or off. |
 | Cars | On | Use the mod in cars, vans and trucks. |
 | Motorcycles | On | Use the mod on motorcycles. |
 | Shape controller input too | Off | Apply the throttle, brake and steering levels to a controller. |
@@ -161,7 +180,6 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | Enable cruise control | On | |
-| Minimum speed | 20 km/h | Cruise control only engages above this true speed, and switches off when the car stays far below it. |
 | Speed change rate | 5 km/h per second | How quickly the car reaches a new cruise speed. |
 | Responsiveness | 100% | How firmly the speed is held. Lower feels softer, higher reacts faster to hills. |
 | After using the pedals | Resume set speed | *Resume set speed* returns to the cruise speed after accelerating. *Use new speed* keeps the speed you let go at. |
@@ -172,6 +190,17 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Maximum cruise braking | 30% | Most brake cruise control uses. |
 | Maximum cruise throttle | 100% | Lower values climb hills and reach a higher cruise speed more gently. |
 
+### Speed Limiter
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| Enable speed limiter | On | |
+| Default limit | 60 | The limit, in the selected speed units, when the speed limiter key is pressed below the minimum speed before any limit was set since loading the game. |
+| Stay on after leaving the car | On | Keep limiting the next car you drive. When off, leaving the driver seat switches the speed limiter off. |
+| Sport key passes the limit | On | Holding the Sport Mode key lifts the limit until you let go. |
+| Brake to stay at the limit | On | Brake lightly downhill, after lowering the limit, or after passing it. When off, the car only coasts. |
+| Maximum limiter braking | 30% | Most brake the speed limiter uses. |
+
 ### Key Bindings
 
 The keys themselves are listed in [Default Key Bindings](#default-key-bindings).
@@ -180,15 +209,16 @@ The keys themselves are listed in [Default Key Bindings](#default-key-bindings).
 | --- | --- | --- |
 | Sport Mode key | Tap or hold | *Hold*: Sport mode while the key is held. *Toggle*: press to switch Sport mode on, press again to switch it off. *Tap or hold*: a short tap toggles, holding gives Sport mode only while held, or the Default levels while held when Sport mode is on. |
 | Gentle Mode key | Tap or hold | *Hold*: Gentle mode while the key is held. *Toggle*: press to switch Gentle mode on, press again to switch it off. *Tap or hold*: a short tap toggles, holding gives Gentle mode only while held, or the Default levels while held when Gentle mode is on. |
+| Set speed keys | Start cruise control | What set speed up and down do while cruise control and the speed limiter are both off. *Start cruise control*: up switches it back on at the last cruise speed, down at the current speed. *Start speed limiter*: up switches it back on at the last limit, down at the current speed rounded up. *Do nothing*: they only change a speed that is already on. |
 
 ### Advanced
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| Debug logging | Off | Writes driving values, key presses, and cruise speed changes to the log. |
+| Debug logging | Off | Writes driving values, key presses, and cruise speed and speed limit changes to the log. |
 
 ## Logs and Debug Logging
 
 The mod writes its log to `red4ext/logs/ImmersiveDriving-*.log` in the game folder. With Mod Organizer 2 the logs land in the MO2 `overwrite` folder instead, for example `overwrite/red4ext/logs/`.
 
-A healthy start logs `Hooked vehicle::BaseObject::UpdateVehicleCameraInput` and `Registered native functions`. With **Advanced > Debug logging** on, the log also shows once per second the speed, the inputs the game computed and what the mod wrote, plus every press of the mod's keys and every cruise speed change. That log is the most useful thing to attach to a bug report.
+A healthy start logs `Hooked vehicle::BaseObject::UpdateVehicleCameraInput` and `Registered native functions`. With **Advanced > Debug logging** on, the log also shows once per second the speed, the inputs the game computed and what the mod wrote, plus every press of the mod's keys and every cruise speed and speed limit change. That log is the most useful thing to attach to a bug report.

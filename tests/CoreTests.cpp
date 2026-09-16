@@ -130,6 +130,11 @@ namespace
         CHECK(config.throttleSportPct == 100);
         CHECK(config.setBool("cruiseUseBrakes", false));
         CHECK(!config.cruiseUseBrakes);
+        CHECK(config.setBool("limiterEnabled", false) && config.setBool("limiterKeepOnExit", false) && config.setBool("limiterKickdown", false) &&
+            config.setBool("limiterUseBrakes", false));
+        CHECK(!config.limiterEnabled && !config.limiterKeepOnExit && !config.limiterKickdown && !config.limiterUseBrakes);
+        CHECK(config.setInt("limiterMaxBrakePct", 150));
+        CHECK(config.limiterMaxBrakePct == 100);
         CHECK(!config.setBool("doesNotExist", true));
         CHECK(!config.setFloat("enabled", 1.0f));
         CHECK(!config.setInt("steerRiseSec", 1));
@@ -583,6 +588,283 @@ namespace
         CHECK(rig.controller.popEvent() == CruiseEvent::None);
     }
 
+    struct LimitCase
+    {
+        const char* name;
+        float maxAcceleration;
+        float topSpeed;
+        float engineLagSec;
+        float grade;
+        float limit;
+        // Sport mode switched on (full throttle, key not held) instead of the Default 60% throttle.
+        bool sport;
+    };
+
+    void testLimiterHoldsLimit()
+    {
+        const LimitCase cases[] = {
+            { "sports car, Sport", 9.0f, 75.0f, 0.2f, 0.0f, 30.0f, true },
+            { "sports car", 9.0f, 75.0f, 0.2f, 0.0f, 30.0f, false },
+            { "city car", 6.0f, 55.0f, 0.25f, 0.0f, 22.0f, false },
+            { "heavy truck, Sport", 2.5f, 42.0f, 0.4f, 0.0f, 25.0f, true },
+            { "motorcycle, Sport", 10.0f, 80.0f, 0.15f, 0.0f, 35.0f, true },
+            { "low limit, Sport", 9.0f, 75.0f, 0.2f, 0.0f, 8.0f, true },
+            { "uphill, Sport", 6.0f, 55.0f, 0.25f, 0.8f, 22.0f, true },
+            { "downhill", 6.0f, 55.0f, 0.25f, -1.5f, 22.0f, false },
+            { "steep downhill", 6.0f, 55.0f, 0.25f, -3.0f, 22.0f, false },
+        };
+
+        for (const auto& c : cases) {
+            Rig rig;
+            rig.vehicle.maxAcceleration = c.maxAcceleration;
+            rig.vehicle.topSpeed = c.topSpeed;
+            rig.vehicle.engineLagSec = c.engineLagSec;
+            rig.vehicle.grade = c.grade;
+            rig.vehicle.speed = 3.0f;
+            rig.step();
+            CHECK(rig.controller.engageLimiter(rig.config, c.limit) == EngageResult::Engaged);
+
+            // The same car without a limiter, to check the limiter does not hold it back on the way up.
+            Rig free;
+            free.vehicle = rig.vehicle;
+
+            rig.context.game.accelerate = 1.0f;
+            rig.context.sport = c.sport;
+            free.context.game.accelerate = 1.0f;
+            free.context.sport = c.sport;
+
+            float reachLimited = -1.0f;
+            float reachFree = -1.0f;
+            float highest = 0.0f;
+            const int steps = static_cast<int>(40.0f / DT);
+            for (int i = 0; i < steps; ++i) {
+                rig.step();
+                free.step();
+                const float time = static_cast<float>(i) * DT;
+                if (reachLimited < 0.0f && rig.vehicle.speed >= c.limit - 0.5f) {
+                    reachLimited = time;
+                }
+                if (reachFree < 0.0f && free.vehicle.speed >= c.limit - 0.5f) {
+                    reachFree = time;
+                }
+                highest = std::max(highest, rig.vehicle.speed);
+            }
+            const auto [low, high] = rig.run(20.0f);
+            std::printf("  limiter hold: %-20s reach %.2f s (free %.2f s), highest %+.2f, settled %+.2f..%+.2f\n",
+                c.name,
+                reachLimited,
+                reachFree,
+                highest - c.limit,
+                low - c.limit,
+                high - c.limit);
+
+            // Eases in shortly before the limit, barely passes it on flat roads, and holds it.
+            CHECK(reachLimited >= 0.0f && reachLimited < reachFree + 1.2f);
+            CHECK(highest < c.limit + (c.grade < 0.0f ? 1.5f : 0.6f));
+            CHECK_NEAR(low, c.limit, 0.3f);
+            CHECK_NEAR(high, c.limit, 0.3f);
+            CHECK(rig.controller.isLimiterActive());
+        }
+    }
+
+    void testLimiterEngageRules()
+    {
+        Rig rig;
+        rig.vehicle.speed = 25.0f;
+        rig.step();
+
+        rig.config.limiterEnabled = false;
+        CHECK(rig.controller.engageLimiter(rig.config, 30.0f) == EngageResult::Disabled);
+        rig.config.limiterEnabled = true;
+        rig.config.enabled = false;
+        CHECK(rig.controller.engageLimiter(rig.config, 30.0f) == EngageResult::Disabled);
+        rig.config.enabled = true;
+
+        rig.context.drivingAllowed = false;
+        rig.step();
+        CHECK(rig.controller.engageLimiter(rig.config, 30.0f) == EngageResult::NotDriving);
+        rig.context.drivingAllowed = true;
+        rig.step();
+
+        // Changing the limit needs an active limiter, and limits below the minimum speed clamp to it.
+        CHECK(!rig.controller.setLimiterTarget(rig.config, 30.0f));
+        CHECK(rig.controller.engageLimiter(rig.config, 1.0f) == EngageResult::Engaged);
+        CHECK_NEAR(rig.controller.getLimiterTarget(), kmhToMps(rig.config.cruiseMinKmh), 1e-4);
+        CHECK(rig.controller.setLimiterTarget(rig.config, 30.0f));
+        CHECK_NEAR(rig.controller.getLimiterTarget(), 30.0f, 1e-6);
+        CHECK_NEAR(rig.controller.getLastLimiterTarget(), 30.0f, 1e-6);
+
+        // Cruise control and the limiter replace each other, silently.
+        CHECK(rig.controller.engageCruise(rig.config, 25.0f) == EngageResult::Engaged);
+        CHECK(!rig.controller.isLimiterActive());
+        CHECK_NEAR(rig.controller.getLastLimiterTarget(), 30.0f, 1e-6);
+        CHECK(rig.controller.engageLimiter(rig.config, 30.0f) == EngageResult::Engaged);
+        CHECK(!rig.controller.isCruiseActive());
+        CHECK(rig.controller.popEvent() == CruiseEvent::None);
+
+        // Cruise control that cannot engage leaves the limiter on.
+        rig.vehicle.speed = 2.0f;
+        rig.step();
+        CHECK(rig.controller.engageCruise(rig.config, 2.0f) == EngageResult::TooSlow);
+        CHECK(rig.controller.isLimiterActive());
+
+        // It waits while driving is not allowed, without touching the inputs.
+        rig.context.drivingAllowed = false;
+        rig.context.game.accelerate = 1.0f;
+        CHECK(!rig.step().write);
+        CHECK(rig.controller.isLimiterActive());
+        CHECK(rig.controller.popEvent() == CruiseEvent::None);
+        rig.context.drivingAllowed = true;
+        rig.step();
+        CHECK(rig.controller.isLimiterActive());
+
+        // Switching it off in the settings does not.
+        rig.config.limiterEnabled = false;
+        rig.step();
+        CHECK(!rig.controller.isLimiterActive());
+        CHECK(!rig.controller.cancelLimiter());
+    }
+
+    void testLimiterLeavesDriverInControl()
+    {
+        Rig rig;
+        rig.vehicle.maxAcceleration = 0.0f;
+        rig.vehicle.speed = 10.0f;
+        rig.step();
+        CHECK(rig.controller.engageLimiter(rig.config, 25.0f) == EngageResult::Engaged);
+
+        // Well below the limit the throttle is the driver's.
+        rig.context.game.accelerate = 1.0f;
+        auto result = rig.stepFor(1.0f);
+        CHECK_NEAR(result.output.accelerate, 0.6f, 1e-6);
+
+        // Braking, the handbrake and coasting are left alone and do not switch it off.
+        rig.context.game.accelerate = 0.0f;
+        rig.context.game.decelerate = 1.0f;
+        rig.context.handbrake = 1.0f;
+        result = rig.step();
+        CHECK_NEAR(result.output.decelerate, 0.5f, 1e-6);
+        rig.context.game.decelerate = 0.0f;
+        rig.context.handbrake = 0.0f;
+        result = rig.stepFor(1.0f);
+        CHECK_NEAR(result.output.accelerate, 0.0f, 1e-6);
+        CHECK_NEAR(result.output.decelerate, 0.0f, 1e-6);
+        CHECK(rig.controller.isLimiterActive());
+
+        // Reversing: the brake key is the reverse throttle, and the limiter never adds any.
+        rig.vehicle.speed = -5.0f;
+        rig.context.speed = -5.0f;
+        rig.context.game.decelerate = 1.0f;
+        result = rig.controller.tick(rig.config, rig.context);
+        CHECK_NEAR(result.output.decelerate, 0.5f, 1e-6);
+        rig.context.game.decelerate = 0.0f;
+        result = rig.controller.tick(rig.config, rig.context);
+        CHECK_NEAR(result.output.decelerate, 0.0f, 1e-6);
+    }
+
+    void testLimiterLowerLimit()
+    {
+        // Brakes on a flat road, only coasting on a flat road, and brakes downhill.
+        for (const auto& [brakes, grade] : { std::pair{ true, 0.0f }, std::pair{ false, 0.0f }, std::pair{ true, -1.5f } }) {
+            Rig rig;
+            rig.config.limiterUseBrakes = brakes;
+            rig.vehicle.grade = grade;
+            rig.vehicle.speed = 25.0f;
+            rig.step();
+            CHECK(rig.controller.engageLimiter(rig.config, 30.0f) == EngageResult::Engaged);
+            rig.context.game.accelerate = 1.0f;
+            rig.context.sport = true;
+            rig.run(15.0f);
+            CHECK_NEAR(rig.vehicle.speed, 30.0f, 0.3f);
+
+            // Still holding the throttle: slows down to the new limit without dropping below it.
+            CHECK(rig.controller.setLimiterTarget(rig.config, 20.0f));
+            float maxBrake = 0.0f;
+            float lowest = rig.vehicle.speed;
+            const int steps = static_cast<int>(20.0f / DT);
+            for (int i = 0; i < steps; ++i) {
+                maxBrake = std::max(maxBrake, rig.step().output.decelerate);
+                lowest = std::min(lowest, rig.vehicle.speed);
+            }
+            CHECK(lowest > 19.5f);
+            CHECK_NEAR(rig.vehicle.speed, 20.0f, 0.3f);
+            if (brakes) {
+                CHECK(maxBrake > 0.05f && maxBrake <= 0.3f + 1e-6);
+            } else {
+                CHECK_NEAR(maxBrake, 0.0f, 1e-6);
+            }
+        }
+    }
+
+    void testLimiterKickdown()
+    {
+        for (const bool kickdown : { true, false }) {
+            Rig rig;
+            rig.config.limiterKickdown = kickdown;
+            rig.vehicle.speed = 15.0f;
+            rig.step();
+            CHECK(rig.controller.engageLimiter(rig.config, 20.0f) == EngageResult::Engaged);
+            rig.context.game.accelerate = 1.0f;
+            rig.run(10.0f);
+
+            // A tap that switches Sport mode on does not lift the limit.
+            rig.context.sport = true;
+            rig.context.sportKeyHeld = true;
+            rig.context.modeKeyHeld = true;
+            rig.stepFor(0.2f);
+            rig.context.sportKeyHeld = false;
+            rig.context.modeKeyHeld = false;
+            auto [low, high] = rig.run(3.0f);
+            CHECK(high < 20.3f);
+
+            // Holding the Sport key.
+            rig.context.sportKeyHeld = true;
+            rig.context.modeKeyHeld = true;
+            std::tie(low, high) = rig.run(5.0f);
+            if (!kickdown) {
+                CHECK(high < 20.6f);
+                continue;
+            }
+            CHECK(high > 26.0f);
+
+            // Letting go returns to the limit at a comfortable rate while still holding the throttle.
+            rig.context.sport = false;
+            rig.context.sportKeyHeld = false;
+            rig.context.modeKeyHeld = false;
+            const float released = rig.vehicle.speed;
+            rig.stepFor(1.0f);
+            CHECK(rig.vehicle.speed < released - 1.0f && rig.vehicle.speed > released - 3.5f);
+            std::tie(low, high) = rig.run(25.0f);
+            CHECK(low > 19.5f);
+            CHECK_NEAR(rig.vehicle.speed, 20.0f, 0.3f);
+        }
+    }
+
+    void testLimiterReset()
+    {
+        Rig rig;
+        rig.vehicle.speed = 25.0f;
+        rig.step();
+        CHECK(rig.controller.engageLimiter(rig.config, 22.0f) == EngageResult::Engaged);
+
+        // Getting into another car keeps it on, when set to.
+        rig.controller.reset(true);
+        CHECK(rig.controller.isLimiterActive());
+        CHECK_NEAR(rig.controller.getLimiterTarget(), 22.0f, 1e-6);
+        rig.vehicle.speed = 15.0f;
+        rig.context.game.accelerate = 1.0f;
+        rig.context.sport = true;
+        const auto [low, high] = rig.run(30.0f, 15.0f);
+        CHECK_NEAR(low, 22.0f, 0.3f);
+        CHECK_NEAR(high, 22.0f, 0.3f);
+
+        // Otherwise it switches off, and the last limit is still there to resume.
+        rig.controller.reset();
+        CHECK(!rig.controller.isLimiterActive());
+        CHECK_NEAR(rig.controller.getLimiterTarget(), 0.0f, 1e-6);
+        CHECK_NEAR(rig.controller.getLastLimiterTarget(), 22.0f, 1e-6);
+    }
+
     struct TestCase
     {
         const char* name;
@@ -606,6 +888,12 @@ int main()
         { "cruise override", testCruiseOverride },
         { "cruise without brakes", testCruiseWithoutBrakes },
         { "reset", testResetClearsState },
+        { "limiter holds limit", testLimiterHoldsLimit },
+        { "limiter engage rules", testLimiterEngageRules },
+        { "limiter leaves driver in control", testLimiterLeavesDriverInControl },
+        { "limiter lower limit", testLimiterLowerLimit },
+        { "limiter kickdown", testLimiterKickdown },
+        { "limiter reset", testLimiterReset },
     };
 
     for (const auto& test : tests) {

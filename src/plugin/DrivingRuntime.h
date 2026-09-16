@@ -54,6 +54,14 @@ namespace immersive_driving
         bool isCruiseActive();
         float getCruiseTarget();
         float getLastCruiseTarget();
+
+        EngageResult engageLimiter(float limit);
+        bool setLimiterTarget(float limit);
+        bool cancelLimiter();
+        bool isLimiterActive();
+        float getLimiterTarget();
+        float getLastLimiterTarget();
+
         float getSpeed();
         CruiseEvent popCruiseEvent();
 

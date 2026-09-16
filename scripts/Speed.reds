@@ -78,6 +78,15 @@ public abstract class ImmersiveDrivingSpeed {
     return ImmersiveDrivingSpeed.SpeedShowing(game, unit, MaxF(shown, lowest));
   }
 
+  // The whole step at or above the number shown for a real speed, and never below the minimum speed. It starts from the
+  // rounded number the speedometer shows, so 60.4 (shown as 60) stays 60 and 61 becomes 65.
+  public static func SnapUp(game: GameInstance, unit: ImmersiveDrivingSpeedUnit, speed: Float, minSpeed: Float) -> Float {
+    let size: Float = ImmersiveDrivingSpeed.StepSize();
+    let shown: Float = Cast<Float>(CeilF(Cast<Float>(RoundMath(ImmersiveDrivingSpeed.ToDisplay(game, unit, speed))) / size - 0.01)) * size;
+    let lowest: Float = Cast<Float>(CeilF(ImmersiveDrivingSpeed.ToDisplay(game, unit, minSpeed) / size - 0.01)) * size;
+    return ImmersiveDrivingSpeed.SpeedShowing(game, unit, MaxF(shown, lowest));
+  }
+
   // A real speed that is shown as the given whole number. Bisection is exact for true units, but the speedometer curve
   // may not rise smoothly, so the result is checked and, if needed, the nearby speeds are searched for the closest one.
   public static func SpeedShowing(game: GameInstance, unit: ImmersiveDrivingSpeedUnit, shown: Float) -> Float {

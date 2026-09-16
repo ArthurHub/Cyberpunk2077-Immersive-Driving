@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 #include "MathUtil.h"
 
@@ -36,6 +37,15 @@ namespace immersive_driving
         constexpr float COLLISION_WINDOW_SEC = 0.2f;
         constexpr float COLLISION_SPEED_DROP = 4.0f;
 
+        // Speed limiter: the cruise controller caps the driver's throttle. It looks ahead by the measured acceleration so
+        // the throttle eases off before the limit, and after kickdown or a lower limit it brings the car down at this rate.
+        constexpr float LIMITER_LOOKAHEAD_SEC = 0.5f;
+        constexpr float LIMITER_SLOWDOWN = 2.0f;
+        constexpr float ACCELERATION_WINDOW_SEC = 0.2f;
+        // Kickdown needs the Sport key held this long, like a hold in the scripts, so a tap that toggles Sport mode does
+        // not lift the limit.
+        constexpr float KICKDOWN_HOLD_SEC = 0.3f;
+
         /**
          * The level for the active key: Sport wins over Gentle.
          */
@@ -68,8 +78,18 @@ namespace immersive_driving
         _speed = context.speed;
         _available = config.enabled && context.drivingAllowed && isKindEnabled(config, context.vehicleKind);
 
+        if (!config.enabled || !config.limiterEnabled) {
+            cancelLimiter();
+        }
+        _sportKeyHeldTime = context.sport && context.sportKeyHeld ? _sportKeyHeldTime + dt : 0.0f;
+
         if (!_available) {
             cancelCruise(CruiseEvent::CancelledUnavailable);
+
+            // The limiter waits, and starts again from the speed the car has when driving is allowed again.
+            _limiter.rampTarget = std::numeric_limits<float>::max();
+            _limiter.braking = false;
+            _limiter.brake = 0.0f;
 
             // Follow the game so nothing jumps when shaping resumes.
             _throttle = clamp01(context.game.accelerate);
@@ -99,6 +119,8 @@ namespace immersive_driving
 
         if (_cruise.active) {
             updateCruise(config, context, dt, result.output);
+        } else if (_limiter.active) {
+            updateLimiter(config, context, dt, result.output);
         }
 
         result.write = true;
@@ -230,6 +252,54 @@ namespace immersive_driving
         output.decelerate = std::max(output.decelerate, cruise.brake);
     }
 
+    void DriveController::updateLimiter(const Config& config, const TickContext& context, const float deltaTime, DriveInputs& output)
+    {
+        auto& limiter = _limiter;
+        const float speed = context.speed;
+
+        // Kickdown: holding the Sport key lifts the limit. After it is let go, the limit follows the car back down.
+        if (config.limiterKickdown && _sportKeyHeldTime >= KICKDOWN_HOLD_SEC) {
+            limiter.rampTarget = std::max(speed, limiter.target);
+            limiter.braking = false;
+            limiter.brake = 0.0f;
+            return;
+        }
+
+        // Above the limit the target comes down gradually, and never stays above the car when it slows down faster.
+        limiter.rampTarget = clamp(moveTowards(limiter.rampTarget, limiter.target, LIMITER_SLOWDOWN * deltaTime), limiter.target, std::max(speed, limiter.target));
+
+        // Anticipating while speeding up eases the throttle off before the limit instead of after it.
+        const float predictedSpeed = speed + std::max(estimateAcceleration(), 0.0f) * LIMITER_LOOKAHEAD_SEC;
+        const float error = limiter.rampTarget - predictedSpeed;
+        const float maxBrake = config.limiterUseBrakes ? percentToFraction(config.limiterMaxBrakePct) : 0.0f;
+
+        // The throttle that holds the limit is only learned at the limit, while the cap holds the car back or the car is
+        // too fast. Coming down to the limit keeps it, so it is still right on arrival. Otherwise the driver is in
+        // control, and braking left over from a downhill is dropped.
+        if (limiter.rampTarget > limiter.target) {
+            // Keep it.
+        } else if (CRUISE_KP * error + limiter.integral < output.accelerate || error < 0.0f) {
+            const float integralMin = maxBrake > 0.0f ? -INTEGRAL_BRAKE_RANGE : 0.0f;
+            limiter.integral = clamp(limiter.integral + CRUISE_KI * error * deltaTime, integralMin, 1.0f);
+        } else {
+            limiter.integral = std::max(limiter.integral, 0.0f);
+        }
+        const float command = CRUISE_KP * error + limiter.integral;
+
+        // Brakes latch like cruise control's, once clearly over the limit.
+        if (maxBrake <= 0.0f || speed <= MIN_BRAKE_SPEED || command >= 0.0f) {
+            limiter.braking = false;
+        } else if (speed - limiter.rampTarget > BRAKE_DEADBAND) {
+            limiter.braking = true;
+        }
+
+        const float brakeTarget = limiter.braking ? clamp(-command * BRAKE_GAIN, 0.0f, maxBrake) : 0.0f;
+        limiter.brake = moveTowards(limiter.brake, brakeTarget, BRAKE_SLEW_PER_SEC * deltaTime);
+
+        output.accelerate = std::min(output.accelerate, clamp01(command));
+        output.decelerate = std::max(output.decelerate, limiter.brake);
+    }
+
     EngageResult DriveController::engageCruise(const Config& config, const float targetSpeed)
     {
         if (!config.enabled || !config.cruiseEnabled) {
@@ -244,6 +314,7 @@ namespace immersive_driving
             return EngageResult::TooSlow;
         }
 
+        cancelLimiter();
         _cruise = CruiseState{};
         _cruise.active = true;
         _cruise.target = std::max(std::isfinite(targetSpeed) ? targetSpeed : _speed, minSpeed);
@@ -295,6 +366,68 @@ namespace immersive_driving
         return _lastCruiseTarget;
     }
 
+    EngageResult DriveController::engageLimiter(const Config& config, const float limit)
+    {
+        if (!config.enabled || !config.limiterEnabled) {
+            return EngageResult::Disabled;
+        }
+        if (!_available) {
+            return EngageResult::NotDriving;
+        }
+
+        cancelCruise();
+        startLimiter(std::max(std::isfinite(limit) ? limit : _speed, kmhToMps(config.cruiseMinKmh)));
+        return EngageResult::Engaged;
+    }
+
+    bool DriveController::setLimiterTarget(const Config& config, const float limit)
+    {
+        if (!_limiter.active || !std::isfinite(limit)) {
+            return false;
+        }
+
+        _limiter.target = std::max(limit, kmhToMps(config.cruiseMinKmh));
+        _lastLimiterTarget = _limiter.target;
+        return true;
+    }
+
+    bool DriveController::cancelLimiter() noexcept
+    {
+        if (!_limiter.active) {
+            return false;
+        }
+
+        _limiter.active = false;
+        _limiter.braking = false;
+        _limiter.brake = 0.0f;
+        return true;
+    }
+
+    bool DriveController::isLimiterActive() const noexcept
+    {
+        return _limiter.active;
+    }
+
+    float DriveController::getLimiterTarget() const noexcept
+    {
+        return _limiter.active ? _limiter.target : 0.0f;
+    }
+
+    float DriveController::getLastLimiterTarget() const noexcept
+    {
+        return _lastLimiterTarget;
+    }
+
+    void DriveController::startLimiter(const float limit) noexcept
+    {
+        _limiter = LimiterState{};
+        _limiter.active = true;
+        _limiter.target = limit;
+        _limiter.rampTarget = std::numeric_limits<float>::max();
+        _limiter.integral = INITIAL_HOLD_THROTTLE;
+        _lastLimiterTarget = limit;
+    }
+
     float DriveController::getSpeed() const noexcept
     {
         return _speed;
@@ -317,9 +450,17 @@ namespace immersive_driving
         return event;
     }
 
-    void DriveController::reset() noexcept
+    void DriveController::reset(const bool keepLimiter) noexcept
     {
+        const bool limiterActive = keepLimiter && _limiter.active;
+        const float limit = _limiter.target;
+        const float lastLimit = _lastLimiterTarget;
+
         *this = DriveController{};
+        if (limiterActive) {
+            startLimiter(limit);
+        }
+        _lastLimiterTarget = lastLimit;
     }
 
     void DriveController::recordSpeed(const float speed) noexcept
@@ -347,6 +488,27 @@ namespace immersive_driving
         }
 
         return highest - newest.speed > COLLISION_SPEED_DROP;
+    }
+
+    float DriveController::estimateAcceleration() const noexcept
+    {
+        if (_historyCount < 2) {
+            return 0.0f;
+        }
+
+        const auto size = _history.size();
+        const auto& newest = _history[(_historyNext + size - 1) % size];
+        const SpeedSample* oldest = &newest;
+        for (std::size_t i = 1; i < _historyCount; ++i) {
+            const auto& sample = _history[(_historyNext + size - 1 - i) % size];
+            if (newest.time - sample.time > ACCELERATION_WINDOW_SEC) {
+                break;
+            }
+            oldest = &sample;
+        }
+
+        const float span = newest.time - oldest->time;
+        return span > 0.0f ? (newest.speed - oldest->speed) / span : 0.0f;
     }
 
     void DriveController::pushEvent(const CruiseEvent event) noexcept

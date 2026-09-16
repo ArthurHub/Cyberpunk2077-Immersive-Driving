@@ -2,9 +2,9 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-> A Cyberpunk 2077 RED4ext plugin that makes keyboard driving calmer and more precise, with Default, Sport and Gentle levels for throttle, brake and steering, and cruise control that really holds your speed, all configurable in-game.
+> A Cyberpunk 2077 RED4ext plugin that makes keyboard driving calmer and more precise, with Default, Sport and Gentle levels for throttle, brake and steering, cruise control that really holds your speed, and a speed limiter, all configurable in-game.
 
-Vanilla keyboard driving is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and there is no way to keep a steady speed. Drive Modes and Cruise Control shapes those inputs every frame before the car receives them. Throttle, brake and steering stay at calmer levels, a Sport key gives full power and a Gentle key gives soft curves and careful parking, steering eases in and calms down at speed, and cruise control holds a set speed on flat roads, uphill and downhill. Every option and every key binding lives in the in-game Mod Settings menu and applies instantly.
+Vanilla keyboard driving is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and there is no way to keep a steady speed. Drive Modes and Cruise Control shapes those inputs every frame before the car receives them. Throttle, brake and steering stay at calmer levels, a Sport key gives full power and a Gentle key gives soft curves and careful parking, steering eases in and calms down at speed, cruise control holds a set speed on flat roads, uphill and downhill, and a speed limiter keeps you under a limit you set. Every option and every key binding lives in the in-game Mod Settings menu and applies instantly.
 
 It runs as a RED4ext plugin (`ImmersiveDriving.dll`) with redscript for the in-game integration, and is inspired by [Immersive Driving by Jo3yization](https://www.nexusmods.com/cyberpunk2077/mods/5293).
 
@@ -35,8 +35,9 @@ What it provides:
 - **Default, Sport and Gentle levels** - throttle, brake and steering each have three levels: Default (60%, 50% and 75% by default), Sport (100%) and Gentle (25%, 25% and 50%), each switched on with a tap of its key or held for a moment.
 - **Smooth, speed-sensitive steering** - steering eases in while you hold a direction, so short taps make small corrections, and is gradually reduced at high speed for stable lane changes. Letting go is instant.
 - **Cruise control that holds speed** - on, off, speed up and down in steps of 5, and resume, like a real car. Accelerating overtakes and then returns to the cruise speed (or adopts the new one), braking or the handbrake cancels, and it brakes lightly downhill so it does not run away.
+- **Speed limiter** - switches on at the current speed rounded up to a step of 5, eases the throttle off before the limit instead of cutting it at the limit, brakes lightly downhill, and lets you pass the limit while holding the Sport key. It stays on for the next car you drive.
 - **Everything in-game** - every value, the key bindings, speed units matching the car's dashboard or HUD speedometer, messages and sounds are in Mod Settings and apply immediately.
-- **Controller friendly** - the levels apply to keyboard driving by default, since triggers and sticks are already analog. Cruise control works with any input device.
+- **Controller friendly** - the levels apply to keyboard driving by default, since triggers and sticks are already analog. Cruise control and the speed limiter work with any input device.
 
 ## Install
 
@@ -88,9 +89,9 @@ To uninstall, delete `red4ext/plugins/ImmersiveDriving` and `r6/input/ImmersiveD
 
 ## Usage
 
-Drive as usual and the car uses the calmer Default levels. Tap **Left Shift** to switch Sport on or off and **Left Alt** for Gentle, or hold either key for a moment of that mode. Switch cruise control on or off with **Mouse 5**, and change the cruise speed in steps of 5 with **Page Up** and **Page Down**. Everything, including the keys, is configured in **Mods > Drive Modes and Cruise Control** from the main menu or the pause menu.
+Drive as usual and the car uses the calmer Default levels. Tap **Left Shift** to switch Sport on or off and **Left Alt** for Gentle, or hold either key for a moment of that mode. Switch cruise control on or off with **Mouse 5** and the speed limiter with **Mouse 4**, and change the cruise speed or the limit in steps of 5 with **Page Up** and **Page Down**. Everything, including the keys, is configured in **Mods > Drive Modes and Cruise Control** from the main menu or the pause menu.
 
-See the **[Usage and Configuration Guide](docs/README.md)** for the drive modes, cruise control, speed units, and every setting with its default.
+See the **[Usage and Configuration Guide](docs/README.md)** for the drive modes, cruise control, the speed limiter, speed units, and every setting with its default.
 
 ### Documentation
 
@@ -104,6 +105,7 @@ Every tick the game zeroes the vehicle's driving inputs and recomputes them from
 
 - **Throttle, brake and steering shaping** scale the game's value by the level for the active key: Sport, Gentle or Default. Default and Gentle steering are also scaled by speed, and steering eases in at a limited rate.
 - **Cruise control** is a PI controller on the measured speed. It follows a target that moves at the configured speed change rate, has anti-windup, limits how fast throttle and brake change, and latches the brakes on when clearly over the target speed. The gains are tuned against a vehicle model covering sports cars, trucks and motorcycles on flat roads and hills (see `tests/CoreTests.cpp`).
+- **The speed limiter** runs the same controller as a ceiling on the driver's throttle. It anticipates the limit from the measured acceleration, only learns the throttle that holds the limit while it holds the car back, and after kickdown or a lower limit brings the car down along a ramp so it does not undershoot.
 - **Game state** comes from redscript. It tracks the driver seat through the player state machine, checks the quest driving restrictions, quickhacks and remote control, forwards the mod's keys, and shows the messages. The plugin also checks AutoDrive every tick.
 
 The driving input offsets are specific to patch 2.31. They were confirmed by disassembling the game's per-tick input update, and the plugin only loads on that patch.
@@ -124,7 +126,7 @@ cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-The plugin is `build/Release/ImmersiveDriving.dll`. The driving logic in `src/core` has no game dependencies and is covered by `tests/CoreTests.cpp`, including the cruise control simulations. To build only the tests, configure with `-DIMMERSIVE_DRIVING_BUILD_PLUGIN=OFF`.
+The plugin is `build/Release/ImmersiveDriving.dll`. The driving logic in `src/core` has no game dependencies and is covered by `tests/CoreTests.cpp`, including the cruise control and speed limiter simulations. To build only the tests, configure with `-DIMMERSIVE_DRIVING_BUILD_PLUGIN=OFF`.
 
 ### Install into the game
 
@@ -152,7 +154,7 @@ This builds, runs the tests and writes `dist/ImmersiveDriving-<version>.zip`, la
 
 | Path | Contents |
 | --- | --- |
-| `src/core` | Game-independent driving logic: settings, input shaping, cruise control |
+| `src/core` | Game-independent driving logic: settings, input shaping, cruise control, speed limiter |
 | `src/plugin` | RED4ext plugin: entry point, vehicle hook, native functions, logging |
 | `scripts` | redscript: Mod Settings page, driving state tracking, keys, messages, speed units |
 | `input` | Input Loader actions and default key bindings |

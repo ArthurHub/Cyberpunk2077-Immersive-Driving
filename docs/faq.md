@@ -1,6 +1,6 @@
 # FAQ and Troubleshooting
 
-Common questions and fixes. For how the modes and cruise control work and the full list of settings, see the [Usage and Configuration Guide](README.md); for install and requirements see the [main README](../README.md); for what changed in each release see the [Changelog](changelog.md).
+Common questions and fixes. For how the modes, cruise control and the speed limiter work and the full list of settings, see the [Usage and Configuration Guide](README.md); for install and requirements see the [main README](../README.md); for what changed in each release see the [Changelog](changelog.md).
 
 Click a question to expand its answer.
 
@@ -8,6 +8,7 @@ Click a question to expand its answer.
 
 - [Getting It Working](#getting-it-working)
 - [Cruise Control](#cruise-control)
+- [Speed Limiter](#speed-limiter)
 - [Keys and Controllers](#keys-and-controllers)
 - [Compatibility](#compatibility)
 - [Settings, Logs and Uninstalling](#settings-logs-and-uninstalling)
@@ -105,7 +106,7 @@ It switches off, with a short message, when you:
 - stay **far below the minimum speed** for a moment, for example stuck in traffic,
 - **leave the driver seat**, or a **scene**, **AutoDrive**, a vehicle **quickhack** or **remote control** takes over the car.
 
-Accelerating never switches it off. When you let go of the throttle, cruise control returns to the cruise speed.
+Accelerating never switches it off. When you let go of the throttle, cruise control returns to the cruise speed. Switching the speed limiter on also switches cruise control off, since only one of them is on at a time.
 
 </details>
 
@@ -119,13 +120,50 @@ Accelerating never switches it off. When you let go of the throttle, cruise cont
 
 </details>
 
+## Speed Limiter
+
+<details>
+  <summary>The car goes faster than the speed limit</summary>
+&#10240;
+
+- **Holding the Sport Mode key** lifts the limit while you hold it, for overtaking. Turn off **Speed Limiter > Sport key passes the limit** for a strict limit. Sport mode switched on with a tap does not lift it.
+- **Steep downhills** can be stronger than the limiter's brakes. Raise **Maximum limiter braking**, and check that **Brake to stay at the limit** is on.
+- **Right after passing the limit or lowering it**, the car slows down to the limit gradually rather than at once.
+- The speedometer can show one more than the limit for a moment while the car settles on it.
+
+</details>
+
+<details>
+  <summary>The speed limiter is still on after I got out of the car</summary>
+&#10240;
+
+That is the default, so the limit also applies to the next car you drive, and a short message reminds you when you get in. Turn off **Speed Limiter > Stay on after leaving the car** to have it switch off when you leave the driver seat. Loading a save always starts with it off.
+
+</details>
+
+<details>
+  <summary>Which limit does the speed limiter key set?</summary>
+&#10240;
+
+Your current speed rounded up to a step of 5 (57 becomes 60, 60 stays 60), so switching it on never slows you down. Below the minimum speed, for example parked, it uses the last limit, or **Default limit** (60) if you have not set one since loading the game. Set speed up and down change it in steps of 5.
+
+</details>
+
+<details>
+  <summary>Can Page Up and Page Down start the speed limiter instead of cruise control?</summary>
+&#10240;
+
+Yes. Set **Key Bindings > Set speed keys** to *Start speed limiter*. Set speed up then switches the speed limiter back on at the last limit, and set speed down at the current speed rounded up. While either cruise control or the speed limiter is on, the keys always change that one.
+
+</details>
+
 ## Keys and Controllers
 
 <details>
-  <summary>Can I use the mouse wheel for cruise speed?</summary>
+  <summary>Can I use the mouse wheel for set speed up and down?</summary>
 &#10240;
 
-Yes. Bind **Cruise speed up** and **Cruise speed down** to the mouse wheel in **Key Bindings**. Keep in mind that the wheel also zooms the vehicle camera in the vanilla game.
+Yes. Bind **Set speed up** and **Set speed down** to the mouse wheel in **Key Bindings**. Keep in mind that the wheel also zooms the vehicle camera in the vanilla game.
 
 Do not put the mouse wheel into `r6/input/ImmersiveDriving.xml` as the default key; see *The game crashes at startup after I edited the input file* in [Getting It Working](#getting-it-working).
 
@@ -135,7 +173,7 @@ Do not put the mouse wheel into `r6/input/ImmersiveDriving.xml` as the default k
   <summary>Does it work with a controller?</summary>
 &#10240;
 
-Cruise control works with any input device. The throttle, brake and steering levels only apply to keyboard driving by default, because triggers and sticks are already analog; turn on **General > Shape controller input too** to apply them to a controller as well.
+Cruise control and the speed limiter work with any input device. The throttle, brake and steering levels only apply to keyboard driving by default, because triggers and sticks are already analog; turn on **General > Shape controller input too** to apply them to a controller as well.
 
 Controller buttons cannot be rebound in Mod Settings. To use one for a mod key, add a `<button id="IK_Pad_..."/>` line to the matching mapping in `r6/input/ImmersiveDriving.xml`.
 
@@ -205,7 +243,7 @@ In the main menu or the pause menu, open **Mods > Drive Modes and Cruise Control
 
 Get in the vehicle where the problem happens and do the thing that goes wrong. Keep it short, a minute or two is plenty, and remember what you pressed. For example, for a problem with the modes: hold accelerate for a few seconds with no mode, then in Gentle, then in Sport.
 
-With debug logging on, the log gets one line per second while you drive, plus every press of the mod's keys, every cruise control change, and every time you get in or out of the driver seat.
+With debug logging on, the log gets one line per second while you drive, plus every press of the mod's keys, every cruise control and speed limiter change, and every time you get in or out of the driver seat.
 
 ### 3. Find the log
 

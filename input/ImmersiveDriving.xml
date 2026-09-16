@@ -9,6 +9,7 @@
 <bindings>
 	<context name="ImmersiveDrivingActions">
 		<action name="ImmersiveDriving_CruiseToggle" map="ImmersiveDriving_CruiseToggle_Button" />
+		<action name="ImmersiveDriving_LimiterToggle" map="ImmersiveDriving_LimiterToggle_Button" />
 		<action name="ImmersiveDriving_CruiseFaster" map="ImmersiveDriving_CruiseFaster_Button" />
 		<action name="ImmersiveDriving_CruiseSlower" map="ImmersiveDriving_CruiseSlower_Button" />
 		<action name="ImmersiveDriving_Gentle" map="ImmersiveDriving_Gentle_Button" />
@@ -30,6 +31,10 @@
 		<event name="BUTTON_PRESSED" />
 		<event name="BUTTON_RELEASED" />
 	</acceptedEvents>
+	<acceptedEvents action="ImmersiveDriving_LimiterToggle">
+		<event name="BUTTON_PRESSED" />
+		<event name="BUTTON_RELEASED" />
+	</acceptedEvents>
 	<!-- No acceptedEvents for faster and slower, like the vanilla mouse wheel actions (NextWeapon, ZoomIn). -->
 	<acceptedEvents action="ImmersiveDriving_Gentle">
 		<event name="BUTTON_PRESSED" />
@@ -42,6 +47,9 @@
 
 	<mapping name="ImmersiveDriving_CruiseToggle_Button" type="Button">
 		<button id="IK_Mouse5" overridableUI="immersiveDrivingCruiseToggle" />
+	</mapping>
+	<mapping name="ImmersiveDriving_LimiterToggle_Button" type="Button">
+		<button id="IK_Mouse4" overridableUI="immersiveDrivingLimiterToggle" />
 	</mapping>
 	<mapping name="ImmersiveDriving_CruiseFaster_Button" type="Button">
 		<button id="IK_PageUp" overridableUI="immersiveDrivingCruiseFaster" />
