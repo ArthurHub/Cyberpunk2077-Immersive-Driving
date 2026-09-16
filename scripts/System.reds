@@ -18,6 +18,8 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private let gentlePressTime: Float;
   private let pollScheduled: Bool;
   private let retryScheduled: Bool;
+  private let refreshScheduled: Bool;
+  private let waitingForDriverSeat: Bool;
 
   public static func Get(game: GameInstance) -> ref<ImmersiveDrivingSystem> {
     return GameInstance.GetScriptableSystemsContainer(game).Get(n"ImmersiveDrivingSystem") as ImmersiveDrivingSystem;
@@ -106,12 +108,16 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
 
   protected cb func OnVehicleStateChanged(value: Int32) -> Bool {
     this.vehicleState = IntEnum<gamePSMVehicle>(value);
+    if IsDefined(this.settings) && this.settings.debugLogging {
+      ImmersiveDriving_Log("Vehicle state " + EnumValueToString("gamePSMVehicle", Cast<Int64>(value)));
+    }
     this.RefreshVehicle();
   }
 
   private func RefreshVehicle() -> Void {
     let player: ref<PlayerPuppet> = this.player;
     if !IsDefined(player) || Equals(this.vehicleState, gamePSMVehicle.Default) {
+      this.waitingForDriverSeat = false;
       this.LeaveVehicle();
       return;
     }
@@ -120,8 +126,19 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     let vehicle: wref<VehicleObject>;
     if !VehicleComponent.GetVehicle(game, player.GetEntityID(), vehicle) || !VehicleComponent.IsDriver(game, player) {
       this.LeaveVehicle();
+      // Seat switches (Auto Drive Enhanced) enter the driving state before the game has the player in the driver seat,
+      // and the state does not change again, so keep checking while the state says the player drives.
+      let driving: Bool = Equals(this.vehicleState, gamePSMVehicle.Driving) || Equals(this.vehicleState, gamePSMVehicle.DriverCombat);
+      if driving {
+        if !this.waitingForDriverSeat && this.settings.debugLogging {
+          ImmersiveDriving_Log("Driving state without the driver seat, checking again");
+        }
+        this.Schedule(ImmersiveDrivingCallbackAction.RefreshVehicle, 0.25);
+      }
+      this.waitingForDriverSeat = driving;
       return;
     }
+    this.waitingForDriverSeat = false;
 
     if !Equals(vehicle.GetEntityID(), this.vehicleID) {
       this.vehicleID = vehicle.GetEntityID();
@@ -413,16 +430,25 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   // Polling, messages and sounds
 
   private func Schedule(action: ImmersiveDrivingCallbackAction, delay: Float) -> Void {
-    if Equals(action, ImmersiveDrivingCallbackAction.Poll) {
-      if this.pollScheduled {
-        return;
-      }
-      this.pollScheduled = true;
-    } else {
-      if this.retryScheduled {
-        return;
-      }
-      this.retryScheduled = true;
+    switch action {
+      case ImmersiveDrivingCallbackAction.Poll:
+        if this.pollScheduled {
+          return;
+        }
+        this.pollScheduled = true;
+        break;
+      case ImmersiveDrivingCallbackAction.RefreshVehicle:
+        if this.refreshScheduled {
+          return;
+        }
+        this.refreshScheduled = true;
+        break;
+      default:
+        if this.retryScheduled {
+          return;
+        }
+        this.retryScheduled = true;
+        break;
     }
 
     let callback: ref<ImmersiveDrivingCallback> = new ImmersiveDrivingCallback();
@@ -435,6 +461,11 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     if Equals(action, ImmersiveDrivingCallbackAction.RegisterListeners) {
       this.retryScheduled = false;
       this.RegisterVehicleStateListener();
+      return;
+    }
+    if Equals(action, ImmersiveDrivingCallbackAction.RefreshVehicle) {
+      this.refreshScheduled = false;
+      this.RefreshVehicle();
       return;
     }
 
@@ -477,7 +508,8 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
 
 enum ImmersiveDrivingCallbackAction {
   Poll = 0,
-  RegisterListeners = 1
+  RegisterListeners = 1,
+  RefreshVehicle = 2
 }
 
 public class ImmersiveDrivingCallback extends DelayCallback {

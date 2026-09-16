@@ -1,6 +1,7 @@
 ## v1.1
 
 - Drive Modes: The Sport and Gentle keys can each work as Hold, Toggle (press to switch the mode on, press again to switch it off), or Tap or hold (a short tap toggles, holding flips the mode only while held without toggling), set in Key Bindings. Tap or hold is the new default. Toggling one mode on switches the other toggled mode off, and holding a key overrides a toggled mode while held.
+- Fix: Switching back to the driver seat with Auto Drive Enhanced left the mod inactive until you got out of the car.
 
 ## v1.0
 
