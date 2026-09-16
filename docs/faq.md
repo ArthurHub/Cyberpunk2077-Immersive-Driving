@@ -11,6 +11,7 @@ Click a question to expand its answer.
 - [Keys and Controllers](#keys-and-controllers)
 - [Compatibility](#compatibility)
 - [Settings, Logs and Uninstalling](#settings-logs-and-uninstalling)
+- [Reporting a Bug](#reporting-a-bug)
 
 ## Getting It Working
 
@@ -180,7 +181,7 @@ In the vanilla game Left Shift and Left Ctrl lean forward and back, and the game
 - The mod's log is `red4ext/logs/ImmersiveDriving-*.log`, and the script compiler's log is `r6/logs/redscript_rCURRENT.log`.
 - With Mod Organizer 2, files the game writes land in the MO2 `overwrite` folder, and `user.ini` can end up in the Mod Settings mod folder or the `overwrite` folder.
 
-Turn on **Advanced > Debug logging** before reproducing a problem; that log is the best thing to attach to a bug report.
+Turn on **Advanced > Debug logging** before reproducing a problem; that log is the best thing to attach to a bug report, see [Reporting a Bug](#reporting-a-bug).
 
 </details>
 
@@ -191,3 +192,46 @@ Turn on **Advanced > Debug logging** before reproducing a problem; that log is t
 Remove the mod in your mod manager, or delete `red4ext/plugins/ImmersiveDriving` and `r6/input/ImmersiveDriving.xml` from the game folder. It does not change saves, so it can be removed at any time.
 
 </details>
+
+## Reporting a Bug
+
+A debug log shows exactly what the mod sees and does while you drive, so it usually answers the question on the first try. It takes a few minutes:
+
+### 1. Turn on debug logging
+
+In the main menu or the pause menu, open **Mods > Drive Modes and Cruise Control > Advanced** and turn on **Debug logging**. It applies immediately, no restart needed.
+
+### 2. Reproduce the problem
+
+Get in the vehicle where the problem happens and do the thing that goes wrong. Keep it short, a minute or two is plenty, and remember what you pressed. For example, for a problem with the modes: hold accelerate for a few seconds with no mode, then in Gentle, then in Sport.
+
+With debug logging on, the log gets one line per second while you drive, plus every press of the mod's keys, every cruise control change, and every time you get in or out of the driver seat.
+
+### 3. Find the log
+
+The log is in the game folder under `red4ext/logs`, named `immersivedriving-<date>-<time>.log`. Each game launch starts a new file, so take the newest one.
+
+| Mod manager | Folder |
+| --- | --- |
+| Vortex or manual install | `<game folder>/red4ext/logs/` |
+| Mod Organizer 2 | `<MO2 folder>/overwrite/red4ext/logs/` |
+
+The game folder is the one that contains `bin`, `r6` and `red4ext`. In Steam: right-click Cyberpunk 2077 > **Manage** > **Browse local files**. In GOG Galaxy: **Manage installation** > **Show folder**.
+
+### 4. Post it on Pastebin
+
+1. Open the log in Notepad, select everything (Ctrl+A) and copy it (Ctrl+C).
+2. Go to [pastebin.com](https://pastebin.com), paste it into the big text box, and set **Paste Exposure** to *Unlisted*.
+3. Click **Create New Paste** and copy the link from the address bar.
+
+If Pastebin says the paste is too large, keep only the start of the log and the part around the problem, or launch the game again and reproduce it in a shorter session.
+
+### 5. Post the report
+
+Post the Pastebin link in the mod's **Bugs** tab on Nexus, together with:
+
+- What you did and what happened, including which vehicle and which keys.
+- The mod version, and your mod manager.
+- Other driving, vehicle or input mods you use.
+
+Turn **Debug logging** off again afterwards; it is not needed for normal play.
