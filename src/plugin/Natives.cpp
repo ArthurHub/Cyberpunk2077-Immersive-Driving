@@ -147,17 +147,21 @@ namespace immersive_driving::natives
         void setGentle(Context*, Frame* frame, void*, int64_t)
         {
             bool active = false;
+            bool keyHeld = false;
             RED4ext::GetParameter(frame, &active);
+            RED4ext::GetParameter(frame, &keyHeld);
             frame->code++;
-            DrivingRuntime::get().setGentle(active);
+            DrivingRuntime::get().setGentle(active, keyHeld);
         }
 
         void setSport(Context*, Frame* frame, void*, int64_t)
         {
             bool active = false;
+            bool keyHeld = false;
             RED4ext::GetParameter(frame, &active);
+            RED4ext::GetParameter(frame, &keyHeld);
             frame->code++;
-            DrivingRuntime::get().setSport(active);
+            DrivingRuntime::get().setSport(active, keyHeld);
         }
 
         void engageCruise(Context*, Frame* frame, int32_t* out, int64_t)
@@ -273,8 +277,8 @@ namespace immersive_driving::natives
             registerGlobal(rtti, "ImmersiveDriving_ClearPlayerVehicle", &clearPlayerVehicle, nullptr, {});
             registerGlobal(rtti, "ImmersiveDriving_SetDrivingAllowed", &setDrivingAllowed, nullptr, { { "Bool", "allowed" } });
             registerGlobal(rtti, "ImmersiveDriving_SetUsingKeyboard", &setUsingKeyboard, nullptr, { { "Bool", "usingKeyboard" } });
-            registerGlobal(rtti, "ImmersiveDriving_SetGentle", &setGentle, nullptr, { { "Bool", "active" } });
-            registerGlobal(rtti, "ImmersiveDriving_SetSport", &setSport, nullptr, { { "Bool", "active" } });
+            registerGlobal(rtti, "ImmersiveDriving_SetGentle", &setGentle, nullptr, { { "Bool", "active" }, { "Bool", "keyHeld" } });
+            registerGlobal(rtti, "ImmersiveDriving_SetSport", &setSport, nullptr, { { "Bool", "active" }, { "Bool", "keyHeld" } });
             registerGlobal(rtti, "ImmersiveDriving_EngageCruise", &engageCruise, "Int32", { { "Float", "targetSpeed" } });
             registerGlobal(rtti, "ImmersiveDriving_SetCruiseTarget", &setCruiseTarget, "Bool", { { "Float", "targetSpeed" } });
             registerGlobal(rtti, "ImmersiveDriving_CancelCruise", &cancelCruise, "Bool", {});

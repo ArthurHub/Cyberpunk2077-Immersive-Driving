@@ -42,8 +42,11 @@ namespace immersive_driving
         void clearPlayerVehicle();
         void setDrivingAllowed(bool allowed);
         void setUsingKeyboard(bool usingKeyboard);
-        void setGentle(bool active);
-        void setSport(bool active);
+        /**
+         * The mode and whether its key is held: a toggled mode stays active after the key is released.
+         */
+        void setGentle(bool active, bool keyHeld);
+        void setSport(bool active, bool keyHeld);
 
         EngageResult engageCruise(float targetSpeed);
         bool setCruiseTarget(float targetSpeed);
@@ -77,6 +80,8 @@ namespace immersive_driving
         bool _usingKeyboard = true;
         bool _gentle = false;
         bool _sport = false;
+        bool _gentleKeyHeld = false;
+        bool _sportKeyHeld = false;
 
         bool _speedAvailable = true;
         bool _autoDrive = false;

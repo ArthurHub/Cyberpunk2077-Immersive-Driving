@@ -32,7 +32,7 @@ This mod works one level deeper. A native plugin sees what the game computed fro
 
 What it provides:
 
-- **Default, Sport and Gentle levels** - throttle, brake and steering each have three levels: Default (60%, 50% and 75% by default), Sport while holding the Sport key (100%), and Gentle while holding the Gentle key (25%, 25% and 50%).
+- **Default, Sport and Gentle levels** - throttle, brake and steering each have three levels: Default (60%, 50% and 75% by default), Sport (100%) and Gentle (25%, 25% and 50%), each switched on with a tap of its key or held for a moment.
 - **Smooth, speed-sensitive steering** - steering eases in while you hold a direction, so short taps make small corrections, and is gradually reduced at high speed for stable lane changes. Letting go is instant.
 - **Cruise control that holds speed** - on, off, speed up and down in steps of 5, and resume, like a real car. Accelerating overtakes and then returns to the cruise speed (or adopts the new one), braking or the handbrake cancels, and it brakes lightly downhill so it does not run away.
 - **Everything in-game** - every value, the key bindings, speed units matching the car's dashboard or HUD speedometer, messages and sounds are in Mod Settings and apply immediately.
@@ -88,7 +88,7 @@ To uninstall, delete `red4ext/plugins/ImmersiveDriving` and `r6/input/ImmersiveD
 
 ## Usage
 
-Drive as usual and the car uses the calmer Default levels. Hold **Left Shift** for Sport and **Left Alt** for Gentle. Switch cruise control on or off with **Mouse 5**, and change the cruise speed in steps of 5 with **Page Up** and **Page Down**. Everything, including the keys, is configured in **Mods > Drive Modes and Cruise Control** from the main menu or the pause menu.
+Drive as usual and the car uses the calmer Default levels. Tap **Left Shift** to switch Sport on or off and **Left Alt** for Gentle, or hold either key for a moment of that mode. Switch cruise control on or off with **Mouse 5**, and change the cruise speed in steps of 5 with **Page Up** and **Page Down**. Everything, including the keys, is configured in **Mods > Drive Modes and Cruise Control** from the main menu or the pause menu.
 
 See the **[Usage and Configuration Guide](docs/README.md)** for the drive modes, cruise control, speed units, and every setting with its default.
 

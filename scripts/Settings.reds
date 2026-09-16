@@ -15,7 +15,16 @@ enum ImmersiveDrivingAfterOverride {
   UseNewSpeed = 1
 }
 
+enum ImmersiveDrivingKeyMode {
+  Hold = 0,
+  Toggle = 1,
+  TapOrHold = 2
+}
+
 public class ImmersiveDrivingSettings extends IScriptable {
+
+  // Told about changes that stay in the scripts (key modes). Not a Mod Settings option.
+  public let system: wref<ImmersiveDrivingSystem>;
 
   // ---------------------------------------------------------------------------------------------------------------------
   // General
@@ -42,14 +51,14 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "General")
   @runtimeProperty("ModSettings.category.order", "0")
   @runtimeProperty("ModSettings.displayName", "Show messages")
-  @runtimeProperty("ModSettings.description", "Short on-screen messages when cruise control changes.")
+  @runtimeProperty("ModSettings.description", "Short on-screen messages when cruise control changes, or a toggle key switches a mode on or off.")
   public let showMessages: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "General")
   @runtimeProperty("ModSettings.category.order", "0")
   @runtimeProperty("ModSettings.displayName", "Play sounds")
-  @runtimeProperty("ModSettings.description", "A soft click when cruise control switches on or off.")
+  @runtimeProperty("ModSettings.description", "A soft click when cruise control, or a mode on a toggle key, switches on or off.")
   public let playSounds: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
@@ -74,14 +83,13 @@ public class ImmersiveDrivingSettings extends IScriptable {
   public let applyToGamepad: Bool = false;
 
   // ---------------------------------------------------------------------------------------------------------------------
-  // Throttle, brake and steering: default, while holding the Sport key, and while holding the Gentle key. Sport wins when
-  // both are held.
+  // Throttle, brake and steering: default, in Sport mode, and in Gentle mode. Sport wins when both are active.
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Default throttle (%)")
-  @runtimeProperty("ModSettings.description", "Throttle when holding accelerate without a mode key.")
+  @runtimeProperty("ModSettings.description", "Throttle when holding accelerate with neither Sport nor Gentle mode active.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -91,7 +99,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Sport throttle (%)")
-  @runtimeProperty("ModSettings.description", "Throttle when holding accelerate with the Sport key.")
+  @runtimeProperty("ModSettings.description", "Throttle when holding accelerate in Sport mode.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -101,7 +109,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Gentle throttle (%)")
-  @runtimeProperty("ModSettings.description", "Throttle when holding accelerate with the Gentle key.")
+  @runtimeProperty("ModSettings.description", "Throttle when holding accelerate in Gentle mode.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -111,7 +119,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Default brake (%)")
-  @runtimeProperty("ModSettings.description", "Brake (and reverse throttle) when holding brake without a mode key.")
+  @runtimeProperty("ModSettings.description", "Brake (and reverse throttle) when holding brake with neither Sport nor Gentle mode active.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -121,7 +129,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Sport brake (%)")
-  @runtimeProperty("ModSettings.description", "Brake (and reverse throttle) when holding brake with the Sport key.")
+  @runtimeProperty("ModSettings.description", "Brake (and reverse throttle) when holding brake in Sport mode.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -131,7 +139,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Gentle brake (%)")
-  @runtimeProperty("ModSettings.description", "Brake (and reverse throttle) when holding brake with the Gentle key.")
+  @runtimeProperty("ModSettings.description", "Brake (and reverse throttle) when holding brake in Gentle mode.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -141,7 +149,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Default steering (%)")
-  @runtimeProperty("ModSettings.description", "Steering when holding left or right without a mode key.")
+  @runtimeProperty("ModSettings.description", "Steering when holding left or right with neither Sport nor Gentle mode active.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -151,7 +159,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Sport steering (%)")
-  @runtimeProperty("ModSettings.description", "Steering when holding left or right with the Sport key. Speed-sensitive steering does not reduce it.")
+  @runtimeProperty("ModSettings.description", "Steering when holding left or right in Sport mode. Speed-sensitive steering does not reduce it.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -161,7 +169,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
   @runtimeProperty("ModSettings.category.order", "1")
   @runtimeProperty("ModSettings.displayName", "Gentle steering (%)")
-  @runtimeProperty("ModSettings.description", "Steering when holding left or right with the Gentle key, for gentle curves and lane changes.")
+  @runtimeProperty("ModSettings.description", "Steering when holding left or right in Gentle mode, for gentle curves and lane changes.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
@@ -340,15 +348,35 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Key Bindings")
   @runtimeProperty("ModSettings.category.order", "4")
   @runtimeProperty("ModSettings.displayName", "Sport Mode")
-  @runtimeProperty("ModSettings.description", "Hold for the Sport throttle, brake and steering levels.")
+  @runtimeProperty("ModSettings.description", "Sport throttle, brake and steering levels, while held or switched on and off (see Sport Mode key).")
   public let immersiveDrivingSport: EInputKey = EInputKey.IK_LShift;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
   @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Sport Mode key")
+  @runtimeProperty("ModSettings.description", "Hold: Sport mode while the key is held. Toggle: press to switch Sport mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Sport mode only while held, or default levels while held when Sport mode is on. A toggled mode also switches off when you leave the driver seat.")
+  @runtimeProperty("ModSettings.displayValues.Hold", "Hold")
+  @runtimeProperty("ModSettings.displayValues.Toggle", "Toggle")
+  @runtimeProperty("ModSettings.displayValues.TapOrHold", "Tap or hold")
+  public let sportKeyMode: ImmersiveDrivingKeyMode = ImmersiveDrivingKeyMode.TapOrHold;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Key Bindings")
+  @runtimeProperty("ModSettings.category.order", "4")
   @runtimeProperty("ModSettings.displayName", "Gentle Mode")
-  @runtimeProperty("ModSettings.description", "Hold for the Gentle throttle, brake and steering levels.")
+  @runtimeProperty("ModSettings.description", "Gentle throttle, brake and steering levels, while held or switched on and off (see Gentle Mode key).")
   public let immersiveDrivingGentle: EInputKey = EInputKey.IK_Alt;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Key Bindings")
+  @runtimeProperty("ModSettings.category.order", "4")
+  @runtimeProperty("ModSettings.displayName", "Gentle Mode key")
+  @runtimeProperty("ModSettings.description", "Hold: Gentle mode while the key is held. Toggle: press to switch Gentle mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Gentle mode only while held, or default levels while held when Gentle mode is on. A toggled mode also switches off when you leave the driver seat.")
+  @runtimeProperty("ModSettings.displayValues.Hold", "Hold")
+  @runtimeProperty("ModSettings.displayValues.Toggle", "Toggle")
+  @runtimeProperty("ModSettings.displayValues.TapOrHold", "Tap or hold")
+  public let gentleKeyMode: ImmersiveDrivingKeyMode = ImmersiveDrivingKeyMode.TapOrHold;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
@@ -383,6 +411,9 @@ public class ImmersiveDrivingSettings extends IScriptable {
 
   public func OnModSettingsChange() -> Void {
     this.Push();
+    if IsDefined(this.system) {
+      this.system.OnSettingsChanged();
+    }
   }
 
   // Sends every native setting to the plugin.

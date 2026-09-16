@@ -60,9 +60,12 @@ namespace immersive_driving
         // Handbrake action value reported by the scripts.
         float handbrake = 0.0f;
         bool usingKeyboard = true;
-        // The Sport and Gentle keys select the throttle, brake and steering levels. Sport wins when both are active.
+        // The Sport and Gentle modes select the throttle, brake and steering levels. Sport wins when both are active.
         bool sport = false;
         bool gentle = false;
+        // A mode key is physically down. A toggled mode stays active without it, and only a key that is really held can
+        // be a vanilla lean key, so the lean pairing fix follows this and not the modes.
+        bool modeKeyHeld = false;
         // The player drives and nothing else (scene, autodrive, ...) owns the car.
         bool drivingAllowed = false;
         VehicleKind vehicleKind = VehicleKind::Unknown;

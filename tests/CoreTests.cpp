@@ -293,6 +293,7 @@ namespace
         rig.config.steeringSmoothing = false;
 
         rig.context.sport = true;
+        rig.context.modeKeyHeld = true;
         rig.context.game = { 0.0f, 0.0f, -paired, paired };
         auto result = rig.step();
         CHECK_NEAR(result.output.steer, -1.0f, 1e-4);
@@ -311,6 +312,13 @@ namespace
         CHECK_NEAR(result.output.steer, 0.0f, 1e-6);
         CHECK_NEAR(result.output.lean, 0.0f, 1e-6);
 
+        // A toggled mode with its key released leaves the vanilla lean keys alone.
+        rig.context.modeKeyHeld = false;
+        rig.context.game = { 0.0f, 0.0f, paired, paired };
+        result = rig.step();
+        CHECK_NEAR(result.output.steer, 0.5f * paired, 1e-4);
+        CHECK_NEAR(result.output.lean, paired, 1e-6);
+
         // Leaning without the mod's keys held stays vanilla.
         rig.context.gentle = false;
         rig.context.game = { 0.0f, 0.0f, paired, paired };
@@ -321,6 +329,7 @@ namespace
         // Controller sticks are really analog, so they are never changed.
         rig.context.usingKeyboard = false;
         rig.context.sport = true;
+        rig.context.modeKeyHeld = true;
         rig.context.game = { 0.0f, 0.0f, 0.5f, 0.5f };
         result = rig.step();
         CHECK_NEAR(result.output.steer, 0.5f, 1e-6);

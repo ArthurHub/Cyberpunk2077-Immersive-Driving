@@ -10,6 +10,12 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private let vehicleState: gamePSMVehicle;
   private let vehicleID: EntityID;
   private let drivingAllowed: Bool;
+  private let sportToggled: Bool;
+  private let sportKeyHeld: Bool;
+  private let gentleToggled: Bool;
+  private let gentleKeyHeld: Bool;
+  private let sportPressTime: Float;
+  private let gentlePressTime: Float;
   private let pollScheduled: Bool;
   private let retryScheduled: Bool;
 
@@ -20,11 +26,11 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   public func OnAttach() -> Void {
     // The plugin outlives game sessions, so start every session from a clean state.
     ImmersiveDriving_SetDrivingAllowed(false);
-    ImmersiveDriving_SetGentle(false);
-    ImmersiveDriving_SetSport(false);
+    this.ClearModes();
     ImmersiveDriving_ClearPlayerVehicle();
 
     this.settings = new ImmersiveDrivingSettings();
+    this.settings.system = this;
     ImmersiveDrivingRegisterSettingsListener(this.settings);
     this.settings.Push();
   }
@@ -135,8 +141,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     this.vehicleID = noVehicle;
     this.drivingAllowed = false;
     ImmersiveDriving_SetDrivingAllowed(false);
-    ImmersiveDriving_SetGentle(false);
-    ImmersiveDriving_SetSport(false);
+    this.ClearModes();
     ImmersiveDriving_ClearPlayerVehicle();
   }
 
@@ -212,26 +217,111 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
         }
         break;
       case n"ImmersiveDriving_Gentle":
-        if ListenerAction.IsButtonJustPressed(action) {
-          ImmersiveDriving_SetGentle(true);
-        } else {
-          if ListenerAction.IsButtonJustReleased(action) {
-            ImmersiveDriving_SetGentle(false);
-          }
-        }
+        this.OnModeKey(action, false);
         break;
       case n"ImmersiveDriving_Sport":
-        if ListenerAction.IsButtonJustPressed(action) {
-          ImmersiveDriving_SetSport(true);
-        } else {
-          if ListenerAction.IsButtonJustReleased(action) {
-            ImmersiveDriving_SetSport(false);
-          }
-        }
+        this.OnModeKey(action, true);
         break;
       default:
         break;
     }
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // Drive modes
+
+  // A mode key works while held, switches its mode on and off, or both: a short tap toggles and a longer press holds
+  // (Key Bindings). Switching one mode on with a toggle switches the other toggled mode off. A held key overrides a
+  // toggled mode only while held.
+  private func OnModeKey(action: ListenerAction, sport: Bool) -> Void {
+    let pressed: Bool = ListenerAction.IsButtonJustPressed(action);
+    if !pressed && !ListenerAction.IsButtonJustReleased(action) {
+      return;
+    }
+
+    let mode: ImmersiveDrivingKeyMode = this.GetKeyMode(sport);
+    let now: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGameInstance()));
+    let toggle: Bool = pressed && Equals(mode, ImmersiveDrivingKeyMode.Toggle);
+    if sport {
+      this.sportKeyHeld = pressed;
+      if pressed {
+        this.sportPressTime = now;
+      } else {
+        toggle = Equals(mode, ImmersiveDrivingKeyMode.TapOrHold) && now - this.sportPressTime < 0.3;
+      }
+    } else {
+      this.gentleKeyHeld = pressed;
+      if pressed {
+        this.gentlePressTime = now;
+      } else {
+        toggle = Equals(mode, ImmersiveDrivingKeyMode.TapOrHold) && now - this.gentlePressTime < 0.3;
+      }
+    }
+
+    if toggle {
+      let active: Bool;
+      if sport {
+        this.sportToggled = !this.sportToggled;
+        active = this.sportToggled;
+      } else {
+        this.gentleToggled = !this.gentleToggled;
+        active = this.gentleToggled;
+      }
+      if active {
+        if sport {
+          this.gentleToggled = false;
+        } else {
+          this.sportToggled = false;
+        }
+      }
+      this.Notify((sport ? "Sport" : "Gentle") + (active ? " mode on" : " mode off"));
+      this.PlayClick();
+    }
+    this.PushModes();
+  }
+
+  private func GetKeyMode(sport: Bool) -> ImmersiveDrivingKeyMode {
+    return sport ? this.settings.sportKeyMode : this.settings.gentleKeyMode;
+  }
+
+  // Sends the active modes to the plugin, with whether each key is physically down (only a held key can be a vanilla
+  // lean key). A held key gives its mode while held and overrides the other toggled mode. Both modes are only active
+  // together when both keys are held, and then Sport wins.
+  private func PushModes() -> Void {
+    let sportInverted: Bool = this.IsHoldInverted(true);
+    let gentleInverted: Bool = this.IsHoldInverted(false);
+    let sportHold: Bool = this.sportKeyHeld && NotEquals(this.GetKeyMode(true), ImmersiveDrivingKeyMode.Toggle) && !sportInverted;
+    let gentleHold: Bool = this.gentleKeyHeld && NotEquals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.Toggle) && !gentleInverted;
+    ImmersiveDriving_SetSport(sportHold || (this.sportToggled && !gentleHold && !sportInverted), this.sportKeyHeld);
+    ImmersiveDriving_SetGentle(gentleHold || (this.gentleToggled && !sportHold && !gentleInverted), this.gentleKeyHeld);
+  }
+
+  // Holding a Tap or hold key while its mode is toggled on does the opposite: the mode is off until the key is released.
+  private func IsHoldInverted(sport: Bool) -> Bool {
+    if sport {
+      return this.sportKeyHeld && this.sportToggled && Equals(this.GetKeyMode(true), ImmersiveDrivingKeyMode.TapOrHold);
+    }
+    return this.gentleKeyHeld && this.gentleToggled && Equals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.TapOrHold);
+  }
+
+  private func ClearModes() -> Void {
+    this.sportToggled = false;
+    this.sportKeyHeld = false;
+    this.gentleToggled = false;
+    this.gentleKeyHeld = false;
+    ImmersiveDriving_SetSport(false, false);
+    ImmersiveDriving_SetGentle(false, false);
+  }
+
+  // A mode that a toggle left on switches off when that key is changed to hold, which would never release it.
+  public func OnSettingsChanged() -> Void {
+    if Equals(this.GetKeyMode(true), ImmersiveDrivingKeyMode.Hold) {
+      this.sportToggled = false;
+    }
+    if Equals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.Hold) {
+      this.gentleToggled = false;
+    }
+    this.PushModes();
   }
 
   // -------------------------------------------------------------------------------------------------------------------

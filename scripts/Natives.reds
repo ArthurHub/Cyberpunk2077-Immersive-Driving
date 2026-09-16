@@ -22,9 +22,9 @@ public native func ImmersiveDriving_SetPlayerVehicle(vehicle: ref<VehicleObject>
 public native func ImmersiveDriving_ClearPlayerVehicle() -> Void;
 public native func ImmersiveDriving_SetDrivingAllowed(allowed: Bool) -> Void;
 public native func ImmersiveDriving_SetUsingKeyboard(usingKeyboard: Bool) -> Void;
-public native func ImmersiveDriving_SetGentle(active: Bool) -> Void;
-// The Sport key: full throttle, brake and steering while held.
-public native func ImmersiveDriving_SetSport(active: Bool) -> Void;
+// Drive modes. keyHeld: the mode's key is physically down, which a toggled mode does not need to stay active.
+public native func ImmersiveDriving_SetGentle(active: Bool, keyHeld: Bool) -> Void;
+public native func ImmersiveDriving_SetSport(active: Bool, keyHeld: Bool) -> Void;
 
 // Cruise control. EngageCruise returns 0 engaged, 1 disabled, 2 not driving, 3 too slow, 4 not ready.
 public native func ImmersiveDriving_EngageCruise(targetSpeed: Float) -> Int32;

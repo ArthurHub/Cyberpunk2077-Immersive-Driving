@@ -54,7 +54,7 @@ The keys are only active while you drive. To see exactly which key presses reach
 Settings apply as soon as you accept them in Mod Settings, including while driving. If a value seems to have no effect:
 
 - Check that you are driving with the **keyboard**, or that *Shape controller input too* is on.
-- Check that no mode key is held. Sport Mode uses the Sport values and Gentle Mode the Gentle values.
+- Check that no mode is active: no mode key held, and no mode switched on with a toggle key. Sport Mode uses the Sport values and Gentle Mode the Gentle values.
 - Steering at speed is also reduced by **speed-sensitive steering**.
 
 Your saved values override the defaults of a new version. Use **Defaults** in Mod Settings to go back to the current defaults.

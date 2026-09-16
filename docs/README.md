@@ -9,6 +9,7 @@ For installation, requirements, and credits see the [main README](../README.md).
 ## Contents
 
 - [Drive Modes](#drive-modes)
+- [Mode Keys: Hold, Toggle, or Tap or Hold](#mode-keys-hold-toggle-or-tap-or-hold)
 - [Default Key Bindings](#default-key-bindings)
 - [Steering](#steering)
 - [Cruise Control](#cruise-control)
@@ -24,17 +25,44 @@ Throttle, brake and steering each have three levels, as a percentage of what the
 
 | Mode | When | Throttle | Brake | Steering |
 | --- | --- | --- | --- | --- |
-| **Default** | No mode key held | 60% | 50% | 75% |
-| **Sport** | Holding the Sport key | 100% | 100% | 100% |
-| **Gentle** | Holding the Gentle key | 25% | 25% | 50% |
+| **Default** | No mode active | 60% | 50% | 75% |
+| **Sport** | Holding the Sport key, or switched on with it | 100% | 100% | 100% |
+| **Gentle** | Holding the Gentle key, or switched on with it | 25% | 25% | 50% |
 
 - **Default** is how the car drives most of the time: a calmer throttle, softer braking, and less twitchy steering.
 - **Sport** is the vanilla car: full throttle for overtaking and chases, full braking, and full steering lock. Speed-sensitive steering does not reduce Sport steering.
 - **Gentle** is for parking, tight streets, slow traffic, and soft lane changes.
-- If both keys are held, **Sport wins**.
+- The mode keys can be held, toggled, or both, see [Mode Keys](#mode-keys-hold-toggle-or-tap-or-hold).
 - The levels apply at once, with no build-up or release delay. Brake also covers reverse throttle.
 
 All nine values are adjustable from 0 to 100%.
+
+## Mode Keys: Hold, Toggle, or Tap or Hold
+
+The Sport and Gentle keys each have their own setting in **Key Bindings**: *Sport Mode key* and *Gentle Mode key*.
+
+- **Hold**: the mode lasts while you hold the key.
+- **Toggle**: press to switch the mode on, press again to switch it off.
+- **Tap or hold** (default): a short tap (under 0.3 s) switches the mode on or off. Holding the key flips the mode only while you hold it, and leaves it as it was when you let go.
+
+What a key does depends on its setting and on which mode is on at the moment. "This mode" is the key's own mode, "the other mode" is the other key's mode.
+
+| Key setting | Right now | Hold the key | Tap the key |
+| --- | --- | --- | --- |
+| Hold | No mode on | This mode while held, then Default | This mode while pressed |
+| Hold | Other mode toggled on | This mode while held, then the other mode again | This mode while pressed |
+| Toggle | No mode on | Switches this mode on | Switches this mode on |
+| Toggle | This mode on | Switches this mode off | Switches this mode off |
+| Toggle | Other mode toggled on | Switches this mode on and the other mode off | Switches this mode on and the other mode off |
+| Tap or hold | No mode on | This mode while held, then Default | Switches this mode on |
+| Tap or hold | This mode on | Default while held, then this mode again | Switches this mode off |
+| Tap or hold | Other mode toggled on | This mode while held, then the other mode again | Switches this mode on and the other mode off |
+
+- Only one mode is on at a time, except while both keys are held, where **Sport wins**.
+- A short message and a click confirm each toggle. Both can be turned off in **General**.
+- A toggled mode switches off when you leave the driver seat, and when its key is changed to *Hold*.
+
+For example, with Sport on *Tap or hold*: tap Left Shift to drive in Sport, hold Left Shift for a moment of calmer Default driving through a tight corner, and tap it again to go back to Default.
 
 ## Default Key Bindings
 
@@ -42,13 +70,13 @@ Rebind the keys in **Mods > Drive Modes and Cruise Control > Key Bindings**, fro
 
 | Action | Default key | What it does |
 | --- | --- | --- |
-| Sport Mode | Left Shift | Hold for the Sport throttle, brake and steering levels |
-| Gentle Mode | Left Alt | Hold for the Gentle throttle, brake and steering levels |
+| Sport Mode | Left Shift | Tap to switch the Sport throttle, brake and steering levels on and off, or hold for them while held |
+| Gentle Mode | Left Alt | Tap to switch the Gentle throttle, brake and steering levels on and off, or hold for them while held |
 | Cruise control on / off | Mouse 5 (front thumb button) | Switches cruise control on at the current speed, or off |
 | Cruise speed up | Page Up | Raises the cruise speed by 5. While cruise control is off, switches it back on at the last cruise speed |
 | Cruise speed down | Page Down | Lowers the cruise speed by 5. While cruise control is off, switches it on at the current speed |
 
-The keys only do something while you drive. The mouse wheel works well for cruise speed up and down, but it also zooms the vehicle camera in the vanilla game.
+Whether the Sport and Gentle keys are held, toggled, or both is set by *Sport Mode key* and *Gentle Mode key* (Tap or hold by default), see [Mode Keys](#mode-keys-hold-toggle-or-tap-or-hold). The keys only do something while you drive. The mouse wheel works well for cruise speed up and down, but it also zooms the vehicle camera in the vanilla game.
 
 ## Steering
 
@@ -83,7 +111,7 @@ The game's speedometers show a number that runs well above the true speed, and c
 - **Keyboard only by default.** Triggers and sticks are already analog, so throttle, brake and steering levels only apply to keyboard driving. Turn on *Shape controller input too* to apply them to a controller as well. Cruise control works with any device.
 - **Controller buttons** can't be rebound in Mod Settings. To use one, add a `<button id="IK_Pad_..."/>` line to the matching mapping in `r6/input/ImmersiveDriving.xml`.
 - **Motorcycles** are supported, and can be switched off separately from cars.
-- **Lean keys.** In the vanilla game Left Shift and Left Ctrl lean forward and back (motorcycles, and cars in the air), and the game scales steering down while a lean key is held. While the Sport or Gentle key is held on the keyboard, the mod restores full steering and drops that lean, so Sport on Left Shift steers fully and does not lean.
+- **Lean keys.** In the vanilla game Left Shift and Left Ctrl lean forward and back (motorcycles, and cars in the air), and the game scales steering down while a lean key is held. While the Sport or Gentle key is held on the keyboard, the mod restores full steering and drops that lean, so Sport on Left Shift steers fully and does not lean. A mode switched on with a toggle key leaves leaning alone once the key is released.
 
 ## In-Game Configuration
 
@@ -97,8 +125,8 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | --- | --- | --- |
 | Enable Drive Modes and Cruise Control | On | Master switch. When off, driving is completely vanilla. |
 | Speed units | Car dashboard | Units for cruise control speeds, see [Speed Units](#speed-units). |
-| Show messages | On | Short on-screen messages when cruise control changes. |
-| Play sounds | On | A soft click when cruise control switches on or off. |
+| Show messages | On | Short on-screen messages when cruise control changes, or a toggle key switches a mode on or off. |
+| Play sounds | On | A soft click when cruise control, or a mode on a toggle key, switches on or off. |
 | Cars | On | Use the mod in cars, vans and trucks. |
 | Motorcycles | On | Use the mod on motorcycles. |
 | Shape controller input too | Off | Apply the throttle, brake and steering levels to a controller. |
@@ -143,6 +171,15 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Brake to hold speed | On | Brake lightly downhill or after lowering the cruise speed. When off, the car only coasts. |
 | Maximum cruise braking | 30% | Most brake cruise control uses. |
 | Maximum cruise throttle | 100% | Lower values climb hills and reach a higher cruise speed more gently. |
+
+### Key Bindings
+
+The keys themselves are listed in [Default Key Bindings](#default-key-bindings).
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| Sport Mode key | Tap or hold | *Hold*: Sport mode while the key is held. *Toggle*: press to switch Sport mode on, press again to switch it off. *Tap or hold*: a short tap toggles, holding gives Sport mode only while held, or the Default levels while held when Sport mode is on. |
+| Gentle Mode key | Tap or hold | *Hold*: Gentle mode while the key is held. *Toggle*: press to switch Gentle mode on, press again to switch it off. *Tap or hold*: a short tap toggles, holding gives Gentle mode only while held, or the Default levels while held when Gentle mode is on. |
 
 ### Advanced
 

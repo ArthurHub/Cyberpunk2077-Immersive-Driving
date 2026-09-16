@@ -81,7 +81,7 @@ namespace immersive_driving
         recordSpeed(context.speed);
 
         float steerInput = clamp(context.game.steer, -1.0f, 1.0f);
-        if (context.usingKeyboard && (context.sport || context.gentle) && std::fabs(context.game.lean) > LEAN_THRESHOLD) {
+        if (context.usingKeyboard && context.modeKeyHeld && std::fabs(context.game.lean) > LEAN_THRESHOLD) {
             // The Sport and Gentle keys can be the vanilla lean keys, which share a paired stick with
             // steering, so the game scales A/D steering down while they are held. Keys are all or nothing, so dividing
             // by the larger component restores the steering, and the unintended lean is dropped.

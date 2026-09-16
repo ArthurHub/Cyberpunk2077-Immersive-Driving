@@ -95,6 +95,7 @@ namespace immersive_driving
         context.usingKeyboard = _usingKeyboard;
         context.gentle = _gentle;
         context.sport = _sport;
+        context.modeKeyHeld = _gentleKeyHeld || _sportKeyHeld;
         context.drivingAllowed = _drivingAllowed && !autoDrive && speedAvailable;
         context.vehicleKind = _vehicleKind;
 
@@ -175,6 +176,8 @@ namespace immersive_driving
         _controller.reset();
         _gentle = false;
         _sport = false;
+        _gentleKeyHeld = false;
+        _sportKeyHeld = false;
         _lastTick = {};
         logger::info("Player left the driver seat");
     }
@@ -191,16 +194,18 @@ namespace immersive_driving
         _usingKeyboard = usingKeyboard;
     }
 
-    void DrivingRuntime::setGentle(const bool active)
+    void DrivingRuntime::setGentle(const bool active, const bool keyHeld)
     {
         std::lock_guard lock(_mutex);
         _gentle = active;
+        _gentleKeyHeld = keyHeld;
     }
 
-    void DrivingRuntime::setSport(const bool active)
+    void DrivingRuntime::setSport(const bool active, const bool keyHeld)
     {
         std::lock_guard lock(_mutex);
         _sport = active;
+        _sportKeyHeld = keyHeld;
     }
 
     EngageResult DrivingRuntime::engageCruise(const float targetSpeed)
