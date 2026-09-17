@@ -12,6 +12,7 @@ Click a question to expand its answer.
 - [Keys and Controllers](#keys-and-controllers)
 - [Compatibility](#compatibility)
 - [Settings, Logs and Uninstalling](#settings-logs-and-uninstalling)
+- [Sending Logs After a Crash](#sending-logs-after-a-crash)
 - [Reporting a Bug](#reporting-a-bug)
 
 ## Getting It Working
@@ -219,7 +220,7 @@ In the vanilla game Left Shift and Left Ctrl lean forward and back, and the game
 - The mod's log is `red4ext/logs/ImmersiveDriving-*.log`, and the script compiler's log is `r6/logs/redscript_rCURRENT.log`.
 - With Mod Organizer 2, files the game writes land in the MO2 `overwrite` folder, and `user.ini` can end up in the Mod Settings mod folder or the `overwrite` folder.
 
-Turn on **Advanced > Debug logging** before reproducing a problem; that log is the best thing to attach to a bug report, see [Reporting a Bug](#reporting-a-bug).
+Turn on **Advanced > Debug logging** before reproducing a problem; that log is the best thing to attach to a bug report, see [Reporting a Bug](#reporting-a-bug). After a crash, see [Sending Logs After a Crash](#sending-logs-after-a-crash).
 
 </details>
 
@@ -230,6 +231,34 @@ Turn on **Advanced > Debug logging** before reproducing a problem; that log is t
 Remove the mod in your mod manager, or delete `red4ext/plugins/ImmersiveDriving` and `r6/input/ImmersiveDriving.xml` from the game folder. It does not change saves, so it can be removed at any time.
 
 </details>
+
+## Sending Logs After a Crash
+
+If the game crashed, the logs from that launch usually show whether this mod was involved. You don't need to read them yourself; just send them:
+
+### 1. Find the logs
+
+| Mod manager | Folder |
+| --- | --- |
+| Vortex or manual install | `<game folder>/red4ext/logs/` |
+| Mod Organizer 2 | `<MO2 folder>/overwrite/red4ext/logs/` |
+
+To find the game folder, see step 3 of [Reporting a Bug](#reporting-a-bug).
+
+Take these two files from the launch that crashed:
+
+- `red4ext-<date>-<time>.log`
+- `immersivedriving-<date>-<time>.log`
+
+The names hold the date and time the game started, so if you have launched the game again since the crash, the right files are not the newest ones.
+
+### 2. Post them
+
+Put each file on Pastebin as in step 4 of [Reporting a Bug](#reporting-a-bug), and post both links in the mod's **Bugs** tab on Nexus, together with:
+
+- What you were doing when it crashed: in the main menu, loading a save, on foot, or driving (which vehicle and which keys).
+- Whether it happens again when you do the same thing.
+- Mods you added, removed or updated since the game last worked.
 
 ## Reporting a Bug
 
