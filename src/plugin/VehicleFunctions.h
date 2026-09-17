@@ -16,7 +16,7 @@ namespace immersive_driving::vehicle_functions
     bool getCurrentSpeed(RED4ext::ISerializable* vehicle, float& speed) noexcept;
 
     /**
-     * True while the patch 2.3 AutoDrive is driving the car.
+     * True in the vehicle's AutoDrive mode. Stays false during the patch 2.3 AutoDrive, which the scripts check through AutoDriveSystem.
      */
     bool isAutoDriveModeEnabled(RED4ext::ISerializable* vehicle, bool& enabled) noexcept;
 }

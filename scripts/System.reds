@@ -173,6 +173,9 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     let allowed: Bool = this.IsDrivingAllowed();
     if NotEquals(allowed, this.drivingAllowed) {
       this.drivingAllowed = allowed;
+      if this.settings.debugLogging {
+        ImmersiveDriving_Log(allowed ? "Driving allowed" : "Driving not allowed");
+      }
       ImmersiveDriving_SetDrivingAllowed(allowed);
     }
   }
@@ -188,6 +191,13 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
 
     // Quests restrict driving through status effects on the player, which swap in the no-drive input contexts.
     if StatusEffectSystem.ObjectHasStatusEffectWithTag(player, n"NoDriving") || StatusEffectSystem.ObjectHasStatusEffectWithTag(player, n"VehicleOnlyForward") {
+      return false;
+    }
+
+    // AutoDrive drives the car itself and ignores the driving inputs. VehicleObject.IsAutoDriveModeEnabled stays false
+    // during the patch 2.3 AutoDrive, the AutoDrive system knows.
+    let autoDrive: ref<AutoDriveSystem> = GameInstance.GetScriptableSystemsContainer(player.GetGame()).Get(n"AutoDriveSystem") as AutoDriveSystem;
+    if IsDefined(autoDrive) && autoDrive.GetAutodriveEnabled() {
       return false;
     }
 
@@ -260,12 +270,15 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
 
   // A mode key works while held, switches its mode on and off, or both: a short tap toggles and a longer press holds
   // (Key Bindings). Switching one mode on with a toggle switches the other toggled mode off. A held key overrides a
-  // toggled mode only while held.
+  // toggled mode only while held. While the player is not really driving (AutoDrive, scene, quickhack) the keys do not
+  // toggle, so no mode is announced that does not apply.
   private func OnModeKey(action: ListenerAction, sport: Bool) -> Void {
     let pressed: Bool = ListenerAction.IsButtonJustPressed(action);
     if !pressed && !ListenerAction.IsButtonJustReleased(action) {
       return;
     }
+    // The poll can lag a state change by up to 0.1 s, so check again before a toggle.
+    this.RefreshDrivingAllowed();
 
     let mode: ImmersiveDrivingKeyMode = this.GetKeyMode(sport);
     let now: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGameInstance()));
@@ -286,7 +299,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
       }
     }
 
-    if toggle {
+    if toggle && this.drivingAllowed {
       let active: Bool;
       if sport {
         this.sportToggled = !this.sportToggled;

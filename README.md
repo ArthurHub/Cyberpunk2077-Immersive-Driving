@@ -106,7 +106,7 @@ Every tick the game zeroes the vehicle's driving inputs and recomputes them from
 - **Throttle, brake and steering shaping** scale the game's value by the level for the active key: Sport, Gentle or Default. Default and Gentle steering are also scaled by speed, and steering eases in at a limited rate.
 - **Cruise control** is a PI controller on the measured speed. It follows a target that moves at the configured speed change rate, has anti-windup, limits how fast throttle and brake change, and latches the brakes on when clearly over the target speed. The gains are tuned against a vehicle model covering sports cars, trucks and motorcycles on flat roads and hills (see `tests/CoreTests.cpp`).
 - **The speed limiter** runs the same controller as a ceiling on the driver's throttle. It anticipates the limit from the measured acceleration, only learns the throttle that holds the limit while it holds the car back, and after kickdown or a lower limit brings the car down along a ramp so it does not undershoot.
-- **Game state** comes from redscript. It tracks the driver seat through the player state machine, checks the quest driving restrictions, quickhacks and remote control, forwards the mod's keys, and shows the messages. The plugin also checks AutoDrive every tick.
+- **Game state** comes from redscript. It tracks the driver seat through the player state machine, checks the quest driving restrictions, AutoDrive, quickhacks and remote control, forwards the mod's keys, and shows the messages.
 
 The driving input offsets are specific to patch 2.31. They were confirmed by disassembling the game's per-tick input update, and the plugin only loads on that patch.
 

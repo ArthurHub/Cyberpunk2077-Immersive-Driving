@@ -6,6 +6,7 @@
 - Speed Limiter: Only one of cruise control and the speed limiter is on at a time.
 - Keys: Cruise speed up and down are now Set speed up and down, and change whichever of cruise control and the speed limiter is on. Set speed keys chooses what they start while both are off: cruise control (default), the speed limiter, or nothing.
 - Config: Minimum speed moved from Cruise Control to General, because it is also the lowest speed limit.
+- Fix: AutoDrive was not detected, so cruise control could switch on during AutoDrive and the Sport and Gentle keys announced modes that did nothing. The mod now stays out of AutoDrive, and the speed limiter waits until you drive again.
 
 ## v1.1
 
