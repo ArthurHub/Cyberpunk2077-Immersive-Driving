@@ -21,6 +21,16 @@ enum ImmersiveDrivingKeyMode {
   TapOrHold = 2
 }
 
+// What the cruise control and speed limiter keys do on a short and on a long press. A key with nothing on its long
+// press acts the moment it goes down.
+enum ImmersiveDrivingKeyUse {
+  Cruise = 0,
+  Limiter = 1,
+  CruiseThenLimiter = 2,
+  LimiterThenCruise = 3,
+  Nothing = 4
+}
+
 // What the set speed up and down keys do while cruise control and the speed limiter are both off.
 enum ImmersiveDrivingSetSpeedKeys {
   StartCruise = 0,
@@ -70,6 +80,13 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.displayName", "Show messages")
   @runtimeProperty("ModSettings.description", "Short on-screen messages when cruise control or the speed limiter changes, or a toggle key switches a mode on or off.")
   public let showMessages: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "General")
+  @runtimeProperty("ModSettings.category.order", "0")
+  @runtimeProperty("ModSettings.displayName", "Show indicators")
+  @runtimeProperty("ModSettings.description", "Keeps cruise control, the speed limiter, and a mode left on by a toggle key listed with the other driving hints (change camera, draw weapon) for as long as they are on.")
+  public let showIndicators: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "General")
@@ -442,16 +459,40 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
   @runtimeProperty("ModSettings.category.order", "5")
-  @runtimeProperty("ModSettings.displayName", "Cruise control on / off")
-  @runtimeProperty("ModSettings.description", "Switch cruise control on at the current speed (rounded to a step of 5), or off. Switches the speed limiter off.")
+  @runtimeProperty("ModSettings.displayName", "First key")
+  @runtimeProperty("ModSettings.description", "The main key for cruise control and the speed limiter. Cruise control switches on at the current speed rounded to a step of 5, the speed limiter at the current speed rounded up. Each switches the other off.")
   public let immersiveDrivingCruiseToggle: EInputKey = EInputKey.IK_Mouse5;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")
   @runtimeProperty("ModSettings.category.order", "5")
-  @runtimeProperty("ModSettings.displayName", "Speed limiter on / off")
-  @runtimeProperty("ModSettings.description", "Switch the speed limiter on at the current speed rounded up to a step of 5, or off. Below the minimum speed it uses the last limit, or the default limit. Switches cruise control off.")
+  @runtimeProperty("ModSettings.displayName", "First key does")
+  @runtimeProperty("ModSettings.description", "A short press switches the first one on or off, and a long press of about half a second the second one, so one key can do both. A key with only one of them acts the moment it goes down. With both on one key, the key waits for the release, cruise control starts from the speed you had when you pressed it, and a short press switches off what the long press put on.")
+  @runtimeProperty("ModSettings.displayValues.Cruise", "Cruise control")
+  @runtimeProperty("ModSettings.displayValues.Limiter", "Speed limiter")
+  @runtimeProperty("ModSettings.displayValues.CruiseThenLimiter", "Cruise control, speed limiter on long press")
+  @runtimeProperty("ModSettings.displayValues.LimiterThenCruise", "Speed limiter, cruise control on long press")
+  @runtimeProperty("ModSettings.displayValues.Nothing", "Nothing")
+  public let cruiseKeyUse: ImmersiveDrivingKeyUse = ImmersiveDrivingKeyUse.Cruise;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Key Bindings")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Second key")
+  @runtimeProperty("ModSettings.description", "The second key for cruise control and the speed limiter, by default the speed limiter on its own. Below the minimum speed the limiter uses the last limit, or the default limit. Set this key to Nothing below and unbind it to drive with one key only.")
   public let immersiveDrivingLimiterToggle: EInputKey = EInputKey.IK_Mouse4;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Key Bindings")
+  @runtimeProperty("ModSettings.category.order", "5")
+  @runtimeProperty("ModSettings.displayName", "Second key does")
+  @runtimeProperty("ModSettings.description", "A short press switches the first one on or off, and a long press of about half a second the second one, so one key can do both. A key with only one of them acts the moment it goes down. With both on one key, the key waits for the release, cruise control starts from the speed you had when you pressed it, and a short press switches off what the long press put on.")
+  @runtimeProperty("ModSettings.displayValues.Cruise", "Cruise control")
+  @runtimeProperty("ModSettings.displayValues.Limiter", "Speed limiter")
+  @runtimeProperty("ModSettings.displayValues.CruiseThenLimiter", "Cruise control, speed limiter on long press")
+  @runtimeProperty("ModSettings.displayValues.LimiterThenCruise", "Speed limiter, cruise control on long press")
+  @runtimeProperty("ModSettings.displayValues.Nothing", "Nothing")
+  public let limiterKeyUse: ImmersiveDrivingKeyUse = ImmersiveDrivingKeyUse.Limiter;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Key Bindings")

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
   ImmersiveDriving
-  VERSION 1.2.0
+  VERSION 1.3.0
   DESCRIPTION "Configurable immersive driving for Cyberpunk 2077: throttle and steering control, slow turn, cruise control, speed limiter"
   LANGUAGES CXX
 )

@@ -4,6 +4,7 @@
 public class ImmersiveDrivingSystem extends ScriptableSystem {
 
   private let settings: ref<ImmersiveDrivingSettings>;
+  private let indicators: ref<ImmersiveDrivingIndicators>;
   private let inputListener: ref<ImmersiveDrivingInputListener>;
   private let player: wref<PlayerPuppet>;
   private let vehicleStateCallback: ref<CallbackHandle>;
@@ -12,10 +13,18 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private let drivingAllowed: Bool;
   private let sportToggled: Bool;
   private let sportKeyHeld: Bool;
+  private let sportIndicated: Bool;
   private let gentleToggled: Bool;
   private let gentleKeyHeld: Bool;
+  private let gentleIndicated: Bool;
   private let sportPressTime: Float;
   private let gentlePressTime: Float;
+  private let cruiseKeyPressTime: Float;
+  private let cruiseKeyPressSpeed: Float;
+  private let cruiseKeyHandledLong: Bool;
+  private let limiterKeyPressTime: Float;
+  private let limiterKeyPressSpeed: Float;
+  private let limiterKeyHandledLong: Bool;
   private let pollScheduled: Bool;
   private let retryScheduled: Bool;
   private let refreshScheduled: Bool;
@@ -32,6 +41,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     ImmersiveDriving_ClearPlayerVehicle();
     ImmersiveDriving_CancelLimiter();
 
+    this.indicators = new ImmersiveDrivingIndicators();
     this.settings = new ImmersiveDrivingSettings();
     this.settings.system = this;
     ImmersiveDrivingRegisterSettingsListener(this.settings);
@@ -64,6 +74,8 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     this.inputListener = ImmersiveDrivingInputListener.Create(this);
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseToggle");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_LimiterToggle");
+    player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseToggleHold");
+    player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_LimiterToggleHold");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseFaster");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_CruiseSlower");
     player.RegisterInputListener(this.inputListener, n"ImmersiveDriving_Gentle");
@@ -163,6 +175,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     let noVehicle: EntityID;
     this.vehicleID = noVehicle;
     this.drivingAllowed = false;
+    this.indicators.Clear(this.GetGameInstance());
     ImmersiveDriving_SetDrivingAllowed(false);
     this.ClearModes();
     ImmersiveDriving_ClearPlayerVehicle();
@@ -177,6 +190,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
         ImmersiveDriving_Log(allowed ? "Driving allowed" : "Driving not allowed");
       }
       ImmersiveDriving_SetDrivingAllowed(allowed);
+      this.RefreshIndicators();
     }
   }
 
@@ -235,13 +249,20 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
         }
         break;
       case n"ImmersiveDriving_CruiseToggle":
-        if ListenerAction.IsButtonJustPressed(action) {
-          this.ToggleCruise();
-        }
+        this.OnToggleKey(action, true);
         break;
       case n"ImmersiveDriving_LimiterToggle":
-        if ListenerAction.IsButtonJustPressed(action) {
-          this.ToggleLimiter();
+        this.OnToggleKey(action, false);
+        break;
+      // Only sent while the key is still held, after the hold timeout in input/ImmersiveDriving.xml.
+      case n"ImmersiveDriving_CruiseToggleHold":
+        if Equals(ListenerAction.GetType(action), gameinputActionType.BUTTON_HOLD_COMPLETE) {
+          this.OnToggleKeyHold(true);
+        }
+        break;
+      case n"ImmersiveDriving_LimiterToggleHold":
+        if Equals(ListenerAction.GetType(action), gameinputActionType.BUTTON_HOLD_COMPLETE) {
+          this.OnToggleKeyHold(false);
         }
         break;
       case n"ImmersiveDriving_CruiseFaster":
@@ -263,6 +284,155 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
       default:
         break;
     }
+  }
+
+  // Each of the two keys switches cruise control or the speed limiter on a short press, and can switch the other one on
+  // a long press (Key Bindings). A key with nothing on its long press acts the moment it goes down, as it always has.
+  // A key that does both has to wait for the release to know which press it was, so the speed at the press is kept and
+  // cruise control starts from it, not from the slightly different speed a moment later.
+  private func OnToggleKey(action: ListenerAction, cruiseKey: Bool) -> Void {
+    let use: ImmersiveDrivingKeyUse = cruiseKey ? this.settings.cruiseKeyUse : this.settings.limiterKeyUse;
+    let shortCommand: ImmersiveDrivingKeyCommand = ImmersiveDrivingSystem.ShortCommand(use);
+    let longCommand: ImmersiveDrivingKeyCommand = ImmersiveDrivingSystem.LongCommand(use);
+
+    if Equals(longCommand, ImmersiveDrivingKeyCommand.Nothing) {
+      if ListenerAction.IsButtonJustPressed(action) {
+        this.RunKeyCommand(shortCommand, 0.0);
+      }
+      return;
+    }
+
+    let now: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGameInstance()));
+    if ListenerAction.IsButtonJustPressed(action) {
+      if cruiseKey {
+        this.cruiseKeyPressTime = now;
+        this.cruiseKeyPressSpeed = ImmersiveDriving_GetSpeed();
+        this.cruiseKeyHandledLong = false;
+      } else {
+        this.limiterKeyPressTime = now;
+        this.limiterKeyPressSpeed = ImmersiveDriving_GetSpeed();
+        this.limiterKeyHandledLong = false;
+      }
+      return;
+    }
+    if !ListenerAction.IsButtonJustReleased(action) {
+      return;
+    }
+
+    let pressTime: Float = cruiseKey ? this.cruiseKeyPressTime : this.limiterKeyPressTime;
+    let pressSpeed: Float = cruiseKey ? this.cruiseKeyPressSpeed : this.limiterKeyPressSpeed;
+    let handledLong: Bool = cruiseKey ? this.cruiseKeyHandledLong : this.limiterKeyHandledLong;
+    if cruiseKey {
+      this.cruiseKeyPressTime = 0.0;
+      this.cruiseKeyHandledLong = false;
+    } else {
+      this.limiterKeyPressTime = 0.0;
+      this.limiterKeyHandledLong = false;
+    }
+
+    // The long press already ran, or the press was never seen, for example because the setting changed while the key
+    // was down.
+    if handledLong || pressTime <= 0.0 {
+      return;
+    }
+    // The hold event comes from input/ImmersiveDriving.xml, which the player can be missing an update of, or another
+    // mod can have replaced. Measuring the press with the same 0.4 s keeps the long press working either way.
+    if now - pressTime >= 0.4 {
+      this.RunKeyCommand(longCommand, 0.0);
+      return;
+    }
+    // While what the long press switches on is on, the short press switches it off again, instead of starting the
+    // other one and leaving the key's own state behind.
+    if this.IsCommandActive(longCommand) {
+      this.RunKeyCommand(longCommand, 0.0);
+      return;
+    }
+    this.RunKeyCommand(shortCommand, pressSpeed);
+  }
+
+  private func OnToggleKeyHold(cruiseKey: Bool) -> Void {
+    let use: ImmersiveDrivingKeyUse = cruiseKey ? this.settings.cruiseKeyUse : this.settings.limiterKeyUse;
+    let longCommand: ImmersiveDrivingKeyCommand = ImmersiveDrivingSystem.LongCommand(use);
+    if Equals(longCommand, ImmersiveDrivingKeyCommand.Nothing) {
+      return;
+    }
+
+    if cruiseKey {
+      this.cruiseKeyHandledLong = true;
+    } else {
+      this.limiterKeyHandledLong = true;
+    }
+    this.RunKeyCommand(longCommand, 0.0);
+  }
+
+  // A start speed of 0 means the speed right now.
+  private func RunKeyCommand(command: ImmersiveDrivingKeyCommand, startSpeed: Float) -> Void {
+    switch command {
+      case ImmersiveDrivingKeyCommand.Cruise:
+        this.ToggleCruise(startSpeed);
+        break;
+      case ImmersiveDrivingKeyCommand.Limiter:
+        this.ToggleLimiter();
+        break;
+      default:
+        break;
+    }
+  }
+
+  private func IsCommandActive(command: ImmersiveDrivingKeyCommand) -> Bool {
+    switch command {
+      case ImmersiveDrivingKeyCommand.Cruise:
+        return ImmersiveDriving_IsCruiseActive();
+      case ImmersiveDrivingKeyCommand.Limiter:
+        return ImmersiveDriving_IsLimiterActive();
+      default:
+        break;
+    }
+    return false;
+  }
+
+  private static func ShortCommand(use: ImmersiveDrivingKeyUse) -> ImmersiveDrivingKeyCommand {
+    switch use {
+      case ImmersiveDrivingKeyUse.Cruise:
+      case ImmersiveDrivingKeyUse.CruiseThenLimiter:
+        return ImmersiveDrivingKeyCommand.Cruise;
+      case ImmersiveDrivingKeyUse.Limiter:
+      case ImmersiveDrivingKeyUse.LimiterThenCruise:
+        return ImmersiveDrivingKeyCommand.Limiter;
+      default:
+        break;
+    }
+    return ImmersiveDrivingKeyCommand.Nothing;
+  }
+
+  private static func LongCommand(use: ImmersiveDrivingKeyUse) -> ImmersiveDrivingKeyCommand {
+    switch use {
+      case ImmersiveDrivingKeyUse.CruiseThenLimiter:
+        return ImmersiveDrivingKeyCommand.Limiter;
+      case ImmersiveDrivingKeyUse.LimiterThenCruise:
+        return ImmersiveDrivingKeyCommand.Cruise;
+      default:
+        break;
+    }
+    return ImmersiveDrivingKeyCommand.Nothing;
+  }
+
+  // The key that switches a command off, for its indicator: the key that runs it on a short press, or else on a long
+  // press. With no key for it at all the usual key is named, so the hint still shows one.
+  private func KeyActionFor(command: ImmersiveDrivingKeyCommand, fallback: CName) -> CName {
+    if Equals(ImmersiveDrivingSystem.ShortCommand(this.settings.cruiseKeyUse), command) {
+      return n"ImmersiveDriving_CruiseToggle";
+    }
+    if Equals(ImmersiveDrivingSystem.ShortCommand(this.settings.limiterKeyUse), command) {
+      return n"ImmersiveDriving_LimiterToggle";
+    }
+    if Equals(ImmersiveDrivingSystem.LongCommand(this.settings.cruiseKeyUse), command) {
+      return n"ImmersiveDriving_CruiseToggle";
+    }
+    if Equals(ImmersiveDrivingSystem.LongCommand(this.settings.limiterKeyUse), command) {
+      return n"ImmersiveDriving_LimiterToggle";
+    }
+    return fallback;
   }
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -335,6 +505,12 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     let gentleHold: Bool = this.gentleKeyHeld && NotEquals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.Toggle) && !gentleInverted;
     ImmersiveDriving_SetSport(sportHold || (this.sportToggled && !gentleHold && !sportInverted), this.sportKeyHeld);
     ImmersiveDriving_SetGentle(gentleHold || (this.gentleToggled && !sportHold && !gentleInverted), this.gentleKeyHeld);
+
+    // The indicators follow the toggled modes only: a key held for a moment is its own indication, and hiding the
+    // indicator for as long as it is held would flicker at the edge of the driver's vision.
+    this.sportIndicated = this.sportToggled;
+    this.gentleIndicated = this.gentleToggled;
+    this.RefreshIndicators();
   }
 
   // Holding a Tap or hold key while its mode is toggled on does the opposite: the mode is off until the key is released.
@@ -348,8 +524,10 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private func ClearModes() -> Void {
     this.sportToggled = false;
     this.sportKeyHeld = false;
+    this.sportIndicated = false;
     this.gentleToggled = false;
     this.gentleKeyHeld = false;
+    this.gentleIndicated = false;
     ImmersiveDriving_SetSport(false, false);
     ImmersiveDriving_SetGentle(false, false);
   }
@@ -368,18 +546,20 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     if !this.settings.enabled || !this.settings.limiterEnabled {
       ImmersiveDriving_CancelLimiter();
     }
+    this.RefreshIndicators();
   }
 
   // -------------------------------------------------------------------------------------------------------------------
   // Cruise control and speed limiter. Only one of them is on at a time, the plugin switches the other one off.
 
-  private func ToggleCruise() -> Void {
+  // A start speed of 0 means the speed right now.
+  private func ToggleCruise(startSpeed: Float) -> Void {
     if ImmersiveDriving_CancelCruise() {
       this.Notify("Cruise control off");
       this.PlayClick();
       return;
     }
-    this.EngageCruise(ImmersiveDriving_GetSpeed());
+    this.EngageCruise(startSpeed > 0.0 ? startSpeed : ImmersiveDriving_GetSpeed());
   }
 
   private func ToggleLimiter() -> Void {
@@ -575,8 +755,26 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
       event = ImmersiveDriving_PopCruiseEvent();
       remaining -= 1;
     }
+    this.RefreshIndicators();
 
     this.Schedule(ImmersiveDrivingCallbackAction.Poll, 0.1);
+  }
+
+  // Shows the states that outlive their message: cruise control, the speed limiter, and a mode left on by a toggle key.
+  // Cheap to call, the indicators only send what changed. Everything is hidden while the player does not really drive,
+  // like the game's own driver hints.
+  private func RefreshIndicators() -> Void {
+    let game: GameInstance = this.GetGameInstance();
+    if !this.settings.showIndicators || !this.settings.enabled || !this.drivingAllowed {
+      this.indicators.Clear(game);
+      return;
+    }
+
+    let cruise: String = ImmersiveDriving_IsCruiseActive() ? this.FormatSpeed(ImmersiveDriving_GetCruiseTarget()) : "";
+    let limiter: String = ImmersiveDriving_IsLimiterActive() ? this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()) : "";
+    let cruiseAction: CName = this.KeyActionFor(ImmersiveDrivingKeyCommand.Cruise, n"ImmersiveDriving_CruiseToggle");
+    let limiterAction: CName = this.KeyActionFor(ImmersiveDrivingKeyCommand.Limiter, n"ImmersiveDriving_LimiterToggle");
+    this.indicators.Refresh(game, cruiseAction, cruise, limiterAction, limiter, this.sportIndicated, this.gentleIndicated);
   }
 
   private func Notify(message: String) -> Void {
@@ -596,6 +794,13 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
       GameInstance.GetAudioSystem(this.GetGameInstance()).Play(n"ui_menu_onpress");
     }
   }
+}
+
+// What one press of a key does. Not a setting, the settings hold what a key does on a short and on a long press.
+enum ImmersiveDrivingKeyCommand {
+  Nothing = 0,
+  Cruise = 1,
+  Limiter = 2
 }
 
 enum ImmersiveDrivingCallbackAction {

@@ -14,6 +14,7 @@ For installation, requirements, and credits see the [main README](../README.md).
 - [Steering](#steering)
 - [Cruise Control](#cruise-control)
 - [Speed Limiter](#speed-limiter)
+- [On-Screen Indicators](#on-screen-indicators)
 - [Speed Units](#speed-units)
 - [Keyboard, Controller and Motorcycles](#keyboard-controller-and-motorcycles)
 - [In-Game Configuration](#in-game-configuration)
@@ -73,10 +74,12 @@ Rebind the keys in **Mods > Drive Modes and Cruise Control > Key Bindings**, fro
 | --- | --- | --- |
 | Sport Mode | Left Shift | Tap to switch the Sport throttle, brake and steering levels on and off, or hold for them while held |
 | Gentle Mode | Left Alt | Tap to switch the Gentle throttle, brake and steering levels on and off, or hold for them while held |
-| Cruise control on / off | Mouse 5 (front thumb button) | Switches cruise control on at the current speed, or off. Switches the speed limiter off |
-| Speed limiter on / off | Mouse 4 (back thumb button) | Switches the speed limiter on at the current speed rounded up, or off. Switches cruise control off |
+| First key | Mouse 5 (front thumb button) | Switches cruise control on at the current speed, or off. Switches the speed limiter off |
+| Second key | Mouse 4 (back thumb button) | Switches the speed limiter on at the current speed rounded up, or off. Switches cruise control off |
 | Set speed up | Page Up | Raises the cruise speed or the speed limit by 5, whichever is on. With both off, switches cruise control back on at the last cruise speed |
 | Set speed down | Page Down | Lowers the cruise speed or the speed limit by 5, whichever is on. With both off, switches cruise control on at the current speed |
+
+What the first and second keys switch is set by *First key does* and *Second key does*: cruise control, the speed limiter, one of them on a short press and the other on a long press of about half a second, or nothing. Putting both on one key leaves the other key free for something else. A key that uses a long press acts when you let go, cruise control then starts from the speed you had when you pressed it, and a short press switches off what the long press put on.
 
 Whether the Sport and Gentle keys are held, toggled, or both is set by *Sport Mode key* and *Gentle Mode key* (Tap or hold by default), see [Mode Keys](#mode-keys-hold-toggle-or-tap-or-hold). With cruise control and the speed limiter both off, *Set speed keys* can make set speed up and down start the speed limiter instead, or do nothing. The keys only do something while you drive. The mouse wheel works well for set speed up and down, but it also zooms the vehicle camera in the vanilla game.
 
@@ -116,6 +119,16 @@ The speed limiter keeps the car from going faster than a limit you set. Drive as
 
 The speed limiter works with keyboard and controller alike.
 
+## On-Screen Indicators
+
+While you drive, whatever is on is listed with the game's own driving hints (change camera, draw weapon), each with the key that switches it off:
+
+- **Cruise 60** — cruise control holding 60, in your [speed units](#speed-units).
+- **Limit 60** — the speed limiter set to 60.
+- **Sport mode**, **Gentle mode** — a mode switched on with a tap. A mode that is only on while you hold its key is not listed, the key under your finger says it already.
+
+The list follows the game's HUD, so it disappears when the HUD does, and while you are not really driving (scenes, AutoDrive, quickhacks, remote control). Turn it off with *Show indicators* in General.
+
 ## Speed Units
 
 The game's speedometers show a number that runs well above the true speed, and cruise control and the speed limiter use the number you actually see. Pick the one that matches the display you read in **General > Speed units**:
@@ -144,6 +157,7 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Enable Drive Modes and Cruise Control | On | Master switch. When off, driving is completely vanilla. |
 | Speed units | Car dashboard | Units for cruise control speeds and speed limits, see [Speed Units](#speed-units). |
 | Minimum speed | 20 km/h | The lowest cruise speed and speed limit, as a true speed. Cruise control only switches on above it, and switches off when the car stays far below it. Below it the speed limiter key uses the last or default limit. |
+| Show indicators | On | Keeps cruise control, the speed limiter, and a mode left on by a toggle key listed with the game's driving hints for as long as they are on, see [On-Screen Indicators](#on-screen-indicators). |
 | Show messages | On | Short on-screen messages when cruise control or the speed limiter changes, or a toggle key switches a mode on or off. |
 | Play sounds | On | A soft click when cruise control, the speed limiter, or a mode on a toggle key switches on or off. |
 | Cars | On | Use the mod in cars, vans and trucks. |
@@ -209,6 +223,8 @@ The keys themselves are listed in [Default Key Bindings](#default-key-bindings).
 | --- | --- | --- |
 | Sport Mode key | Tap or hold | *Hold*: Sport mode while the key is held. *Toggle*: press to switch Sport mode on, press again to switch it off. *Tap or hold*: a short tap toggles, holding gives Sport mode only while held, or the Default levels while held when Sport mode is on. |
 | Gentle Mode key | Tap or hold | *Hold*: Gentle mode while the key is held. *Toggle*: press to switch Gentle mode on, press again to switch it off. *Tap or hold*: a short tap toggles, holding gives Gentle mode only while held, or the Default levels while held when Gentle mode is on. |
+| First key does | Cruise control | What the first key switches, on a short press and on a long press of about half a second: *Cruise control*, *Speed limiter*, *Cruise control, speed limiter on long press*, *Speed limiter, cruise control on long press*, or *Nothing*. |
+| Second key does | Speed limiter | The same for the second key. A key that uses a long press acts when you let go, cruise control then starts from the speed you had when you pressed it, and a short press switches off what the long press put on. |
 | Set speed keys | Start cruise control | What set speed up and down do while cruise control and the speed limiter are both off. *Start cruise control*: up switches it back on at the last cruise speed, down at the current speed. *Start speed limiter*: up switches it back on at the last limit, down at the current speed rounded up. *Do nothing*: they only change a speed that is already on. |
 
 ### Advanced

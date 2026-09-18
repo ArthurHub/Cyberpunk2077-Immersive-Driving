@@ -1,3 +1,10 @@
+## v1.3
+
+- Indicators: Cruise control, the speed limiter, and a mode left on by a toggle key now stay listed with the game's driving hints (change camera, draw weapon) for as long as they are on, each with the key that switches it off. Turn them off with Show indicators in General.
+- Keys: What each of the two keys does is now a setting. A key can switch cruise control or the speed limiter on a short press, the other one on a long press of about half a second, or nothing at all, so both fit on one key and the other key is free.
+- Keys: With a long press in use, that key acts when it is released, cruise control starts from the speed you had when you pressed it, and a short press switches off what the long press put on.
+- Config: Cruise control on / off and Speed limiter on / off are now First key and Second key in Key Bindings, with First key does and Second key does next to them. The keys themselves and their defaults are unchanged.
+
 ## v1.2
 
 - Speed Limiter: A new speed limiter keeps the car from going faster than a set limit. Mouse 4 switches it on at the current speed rounded up to a step of 5, or off, and set speed up and down change the limit. The throttle eases off before the limit, and the car brakes lightly downhill. Braking, the handbrake and crashes leave it on.
