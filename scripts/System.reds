@@ -29,6 +29,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private let retryScheduled: Bool;
   private let refreshScheduled: Bool;
   private let waitingForDriverSeat: Bool;
+  private let exitHintHidden: Bool;
 
   public static func Get(game: GameInstance) -> ref<ImmersiveDrivingSystem> {
     return GameInstance.GetScriptableSystemsContainer(game).Get(n"ImmersiveDrivingSystem") as ImmersiveDrivingSystem;
@@ -154,16 +155,27 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     }
     this.waitingForDriverSeat = false;
 
-    if !Equals(vehicle.GetEntityID(), this.vehicleID) {
+    let newVehicle: Bool = !Equals(vehicle.GetEntityID(), this.vehicleID);
+    if newVehicle {
       this.vehicleID = vehicle.GetEntityID();
       ImmersiveDriving_SetPlayerVehicle(vehicle, ImmersiveDrivingSystem.GetVehicleKind(vehicle));
-      // A speed limiter that stayed on after leaving the last car is easy to forget.
-      if ImmersiveDriving_IsLimiterActive() {
-        this.Notify("Speed limiter " + this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()));
+      // A speed limiter or a mode that stayed on after leaving the last car is easy to forget. Both go in one message,
+      // the on-screen message has room for one at a time.
+      let reminder: String = ImmersiveDriving_IsLimiterActive() ? "Speed limiter " + this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()) : "";
+      let mode: String = this.sportToggled ? "Sport mode on" : (this.gentleToggled ? "Gentle mode on" : "");
+      if StrLen(mode) > 0 {
+        reminder = StrLen(reminder) > 0 ? reminder + ", " + mode : mode;
+      }
+      if StrLen(reminder) > 0 {
+        this.Notify(reminder);
       }
     }
 
     this.RefreshDrivingAllowed();
+    // A mode kept from the last car reaches the plugin when the new car is set.
+    if newVehicle {
+      this.PushModes();
+    }
     this.Schedule(ImmersiveDrivingCallbackAction.Poll, 0.1);
   }
 
@@ -177,7 +189,18 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     this.drivingAllowed = false;
     this.indicators.Clear(this.GetGameInstance());
     ImmersiveDriving_SetDrivingAllowed(false);
-    this.ClearModes();
+    // With Keep mode after leaving the car a toggled mode stays on for the next car, like the speed limiter. Either
+    // way the keys count as released, a key let go outside the car is never seen here.
+    if this.settings.modeKeepOnExit {
+      this.sportKeyHeld = false;
+      this.gentleKeyHeld = false;
+      this.sportIndicated = false;
+      this.gentleIndicated = false;
+      ImmersiveDriving_SetSport(false, false);
+      ImmersiveDriving_SetGentle(false, false);
+    } else {
+      this.ClearModes();
+    }
     ImmersiveDriving_ClearPlayerVehicle();
   }
 
@@ -541,7 +564,13 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     if Equals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.Hold) {
       this.gentleToggled = false;
     }
+    // A mode kept from an earlier car has nothing to keep it once the setting is off.
+    if !this.settings.modeKeepOnExit && !EntityID.IsDefined(this.vehicleID) {
+      this.sportToggled = false;
+      this.gentleToggled = false;
+    }
     this.PushModes();
+    this.RefreshExitHint();
 
     if !this.settings.enabled || !this.settings.limiterEnabled {
       ImmersiveDriving_CancelLimiter();
@@ -774,7 +803,50 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     let limiter: String = ImmersiveDriving_IsLimiterActive() ? this.FormatSpeed(ImmersiveDriving_GetLimiterTarget()) : "";
     let cruiseAction: CName = this.KeyActionFor(ImmersiveDrivingKeyCommand.Cruise, n"ImmersiveDriving_CruiseToggle");
     let limiterAction: CName = this.KeyActionFor(ImmersiveDrivingKeyCommand.Limiter, n"ImmersiveDriving_LimiterToggle");
-    this.indicators.Refresh(game, cruiseAction, cruise, limiterAction, limiter, this.sportIndicated, this.gentleIndicated);
+    this.indicators.Refresh(game, this.IndicatorBasePriority(), cruiseAction, cruise, limiterAction, limiter, this.sportIndicated, this.gentleIndicated);
+  }
+
+  // Where the indicators sort among the driving hints. The game sorts draw weapon at 1 and change camera at 2, and exit
+  // vehicle at 127, where mods that want to come last put their hints too (Enhanced Vehicle System). A crowded list
+  // runs off the screen, so After the game's hints keeps the indicators above exit vehicle and Last goes below it.
+  private func IndicatorBasePriority() -> Int32 {
+    switch this.settings.indicatorPlacement {
+      case ImmersiveDrivingIndicatorPlacement.First:
+        return -1000;
+      case ImmersiveDrivingIndicatorPlacement.Last:
+        return 1000;
+      default:
+        return 10;
+    }
+  }
+
+  // Whether the game's exit vehicle hint is hidden while the player drives, asked by the wrapper in Indicators.reds.
+  public func IsHidingExitHint() -> Bool {
+    return IsDefined(this.settings) && this.settings.enabled && this.settings.hideExitHint;
+  }
+
+  // The game sends the exit vehicle hint when the driving state changes, so a change to the setting is applied to the
+  // car the player is in right now. Putting the hint back is skipped while the game would hide it anyway (scenes,
+  // vehicle combat, a quest that blocks getting out); the next state change sends the right thing.
+  private func RefreshExitHint() -> Void {
+    let hide: Bool = this.IsHidingExitHint();
+    if Equals(hide, this.exitHintHidden) {
+      return;
+    }
+    this.exitHintHidden = hide;
+
+    let player: ref<PlayerPuppet> = this.player;
+    if !IsDefined(player) || !EntityID.IsDefined(this.vehicleID) {
+      return;
+    }
+    if !hide && (StatusEffectSystem.ObjectHasStatusEffectWithTag(player, n"VehicleScene")
+        || StatusEffectSystem.ObjectHasStatusEffectWithTag(player, n"VehicleCombat")
+        || StatusEffectSystem.ObjectHasStatusEffectWithTag(player, n"VehicleBlockExit")) {
+      return;
+    }
+
+    let vehicle: ref<VehicleObject> = GameInstance.FindEntityByID(player.GetGame(), this.vehicleID) as VehicleObject;
+    this.indicators.SendExitHint(this.GetGameInstance(), !hide, IsDefined(vehicle as BikeObject));
   }
 
   private func Notify(message: String) -> Void {

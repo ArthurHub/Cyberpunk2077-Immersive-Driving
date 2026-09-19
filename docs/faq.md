@@ -202,6 +202,22 @@ In the vanilla game Left Shift and Left Ctrl lean forward and back, and the game
 </details>
 
 <details>
+  <summary>The indicators are gone, or pushed off the screen, with another vehicle mod</summary>
+&#10240;
+
+The indicators are gameplay input hints, the same list the game fills with *change camera* and *draw weapon* while you drive. Other mods add hints of their own, and once the list is long enough it runs off the edge of the screen.
+
+The game sorts *draw weapon* first, then *change camera*, and *exit vehicle* last. Mods that want to come last use the same sorting value as *exit vehicle*, so they land in that block at the bottom.
+
+- **Move the indicators:** *Indicator placement* in **General** puts them *First*, *After the game's hints* (default, above *exit vehicle*), or *Last* (below *exit vehicle* and below other mods' hints). Try the placements and keep the one you can read. Above *exit vehicle* and below another mod's hints is not possible, because that mod's hints share their sorting value with *exit vehicle*.
+- **Show fewer hints from the other mod:** **Enhanced Vehicle System** adds up to seven, and each one has a switch: open **Settings > Mods** (the Native Settings UI page, not the Mods entry this mod uses), pick **Enhanced Vehicle System**, and its first page is a menu of buttons — click **Input hints**, and turn off power / engine, doors, hood / trunk / spoiler, windows, crystal dome, headlights call or light settings. The settings are saved for the next launch.
+- **Or edit the file**, with the game closed: `bin/x64/plugins/cyber_engine_tweaks/mods/Enhanced Vehicle System/settings.json` has a `hints` section with the same seven entries, and setting them to `false` does the same thing. With Mod Organizer 2 that file is in the `overwrite` folder, not in the mod folder. The game writes this file when you leave the settings menu, so edit it while the game is not running.
+- **Make room:** *Hide the exit vehicle hint* in **General** drops the game's own *exit vehicle* hint while you drive, which frees one line. The key still works, and passengers, remote control and AutoDrive keep the hint.
+- **Or turn the indicators off:** *Show indicators* in **General**. The on-screen messages still confirm every change.
+
+</details>
+
+<details>
   <summary>Will it break after a game or framework update?</summary>
 &#10240;
 

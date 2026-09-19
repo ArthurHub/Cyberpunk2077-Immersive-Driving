@@ -31,6 +31,14 @@ enum ImmersiveDrivingKeyUse {
   Nothing = 4
 }
 
+// Where the mod's indicators sit in the game's driving hints. Other mods add hints of their own (Enhanced Vehicle
+// System adds up to seven), and a long list runs off the edge of the screen, so the placement is a setting.
+enum ImmersiveDrivingIndicatorPlacement {
+  AfterHints = 0,
+  First = 1,
+  Last = 2
+}
+
 // What the set speed up and down keys do while cruise control and the speed limiter are both off.
 enum ImmersiveDrivingSetSpeedKeys {
   StartCruise = 0,
@@ -87,6 +95,24 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.displayName", "Show indicators")
   @runtimeProperty("ModSettings.description", "Keeps cruise control, the speed limiter, and a mode left on by a toggle key listed with the other driving hints (change camera, draw weapon) for as long as they are on.")
   public let showIndicators: Bool = true;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "General")
+  @runtimeProperty("ModSettings.category.order", "0")
+  @runtimeProperty("ModSettings.displayName", "Indicator placement")
+  @runtimeProperty("ModSettings.description", "Where the indicators sit in the list of driving hints. The game puts draw weapon and change camera first and exit vehicle last, and other mods add hints of their own, so a long list runs off the edge of the screen. After the game's hints puts the indicators above exit vehicle, Last puts them below it and below other mods' hints. If the indicators are not where you expect them, or not there at all, try the other placements.")
+  @runtimeProperty("ModSettings.displayValues.AfterHints", "After the game's hints")
+  @runtimeProperty("ModSettings.displayValues.First", "First")
+  @runtimeProperty("ModSettings.displayValues.Last", "Last")
+  @runtimeProperty("ModSettings.dependency", "showIndicators")
+  public let indicatorPlacement: ImmersiveDrivingIndicatorPlacement = ImmersiveDrivingIndicatorPlacement.AfterHints;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "General")
+  @runtimeProperty("ModSettings.category.order", "0")
+  @runtimeProperty("ModSettings.displayName", "Hide the exit vehicle hint")
+  @runtimeProperty("ModSettings.description", "Hides the game's exit vehicle hint while you drive, to make room in a crowded hint list. The key still works. Passengers, remote control and AutoDrive keep the hint.")
+  public let hideExitHint: Bool = false;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "General")
@@ -208,6 +234,13 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
   public let steerGentlePct: Int32 = 50;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
+  @runtimeProperty("ModSettings.category.order", "1")
+  @runtimeProperty("ModSettings.displayName", "Keep mode after leaving the car")
+  @runtimeProperty("ModSettings.description", "A mode switched on with a toggle key stays on when you get out, and applies to the next car you drive, with a short reminder when you get in. When off, leaving the driver seat switches the mode off. Loading a save always starts with no mode on.")
+  public let modeKeepOnExit: Bool = false;
 
   // ---------------------------------------------------------------------------------------------------------------------
   // Advanced steering

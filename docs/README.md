@@ -62,7 +62,7 @@ What a key does depends on its setting and on which mode is on at the moment. "T
 
 - Only one mode is on at a time, except while both keys are held, where **Sport wins**.
 - A short message and a click confirm each toggle. Both can be turned off in **General**.
-- A toggled mode switches off when you leave the driver seat, and when its key is changed to *Hold*.
+- A toggled mode switches off when you leave the driver seat, and when its key is changed to *Hold*. Turn on *Keep mode after leaving the car* in **Throttle, Brake and Steering** to keep it instead: the mode then applies to the next car you drive, with a short reminder when you get in, and loading a save still starts with no mode on.
 
 For example, with Sport on *Tap or hold*: tap Left Shift to drive in Sport, hold Left Shift for a moment of calmer Default driving through a tight corner, and tap it again to go back to Default.
 
@@ -129,6 +129,10 @@ While you drive, whatever is on is listed with the game's own driving hints (cha
 
 The list follows the game's HUD, so it disappears when the HUD does, and while you are not really driving (scenes, AutoDrive, quickhacks, remote control). Turn it off with *Show indicators* in General.
 
+The game lists *draw weapon* and *change camera* first and *exit vehicle* last, and other mods add hints of their own, so a long list runs off the edge of the screen. *Indicator placement* in General says where the indicators go: *First*, *After the game's hints* (default, above *exit vehicle*), or *Last* (below *exit vehicle* and below other mods' hints). If the indicators are missing or not where you want them, try the other placements, or turn off hints you do not need in the other mod, see the [FAQ](faq.md).
+
+*Hide the exit vehicle hint* in General drops the game's own *exit vehicle* hint while you drive, for one more free line. The key still works, and passengers, remote control and AutoDrive keep the hint.
+
 ## Speed Units
 
 The game's speedometers show a number that runs well above the true speed, and cruise control and the speed limiter use the number you actually see. Pick the one that matches the display you read in **General > Speed units**:
@@ -158,6 +162,8 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Speed units | Car dashboard | Units for cruise control speeds and speed limits, see [Speed Units](#speed-units). |
 | Minimum speed | 20 km/h | The lowest cruise speed and speed limit, as a true speed. Cruise control only switches on above it, and switches off when the car stays far below it. Below it the speed limiter key uses the last or default limit. |
 | Show indicators | On | Keeps cruise control, the speed limiter, and a mode left on by a toggle key listed with the game's driving hints for as long as they are on, see [On-Screen Indicators](#on-screen-indicators). |
+| Indicator placement | After the game's hints | Where the indicators sit in the list of driving hints: *First*, *After the game's hints* (above *exit vehicle*), or *Last* (below *exit vehicle* and other mods' hints). Use it when another mod's hints crowd them off the screen. |
+| Hide the exit vehicle hint | Off | Hides the game's own *exit vehicle* hint while you drive, to make room in a crowded hint list. The key still works. |
 | Show messages | On | Short on-screen messages when cruise control or the speed limiter changes, or a toggle key switches a mode on or off. |
 | Play sounds | On | A soft click when cruise control, the speed limiter, or a mode on a toggle key switches on or off. |
 | Cars | On | Use the mod in cars, vans and trucks. |
@@ -177,6 +183,12 @@ Open **Mods > Drive Modes and Cruise Control** from the main menu or the pause m
 | Default steering | 75% |
 | Sport steering | 100% |
 | Gentle steering | 50% |
+
+All nine are a percentage of the vanilla input, see [Drive Modes](#drive-modes).
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| Keep mode after leaving the car | Off | A mode switched on with a toggle key stays on when you get out and applies to the next car you drive, with a short reminder when you get in. When off, leaving the driver seat switches the mode off. |
 
 ### Advanced Steering
 

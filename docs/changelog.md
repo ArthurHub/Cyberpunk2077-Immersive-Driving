@@ -1,3 +1,9 @@
+## v1.4
+
+- Drive Modes: New Keep mode after leaving the car (off by default) keeps a mode left on by a toggle key when you get out, so it applies to the next car you drive, with a short reminder when you get in, like the speed limiter. Loading a save still starts with no mode on.
+- Indicators: New Indicator placement in General puts the indicators first, after the game's driving hints (default, above exit vehicle), or last, below exit vehicle and other mods' hints. Other mods add driving hints of their own, and a long list runs off the edge of the screen.
+- Indicators: New Hide the exit vehicle hint (off by default) drops the game's own exit vehicle hint while you drive, for one more line in a crowded hint list. The key still works, and passengers, remote control and AutoDrive keep the hint.
+
 ## v1.3
 
 - Indicators: Cruise control, the speed limiter, and a mode left on by a toggle key now stay listed with the game's driving hints (change camera, draw weapon) for as long as they are on, each with the key that switches it off. Turn them off with Show indicators in General.
