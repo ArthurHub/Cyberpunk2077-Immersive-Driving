@@ -13,7 +13,7 @@ namespace immersive_driving::vehicle_hook
     namespace
     {
         // RED4ext address hash of vehicle::BaseObject::UpdateVehicleCameraInput (also hooked by Let There Be Flight).
-        // Patch 2.31 lists it in bin/x64/cyberpunk2077_addresses.json. The game calls it right after computing the
+        // Patch 2.5 lists it in bin/x64/cyberpunk2077_addresses.json. The game calls it right after computing the
         // driving inputs and right before the vehicle consumes them, which makes it the place to shape them.
         constexpr std::uint32_t UPDATE_VEHICLE_CAMERA_INPUT_HASH = 501486464u;
 

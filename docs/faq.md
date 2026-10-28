@@ -23,7 +23,7 @@ Click a question to expand its answer.
 
 The plugin is probably not loading. Open the RED4ext log (`red4ext/logs/red4ext-*.log`, or the MO2 `overwrite` folder when using Mod Organizer 2):
 
-- If it says the plugin *uses RED4ext.SDK ... which is not supported* or does not list `ImmersiveDriving` at all, update RED4ext and check that the game is patch 2.31.
+- If it says the plugin *uses RED4ext.SDK ... which is not supported* or does not list `ImmersiveDriving` at all, update RED4ext and check that the game is patch 2.5 (v1.4 is the version for patch 2.31).
 - If it lists `ImmersiveDriving ... has been loaded`, open `red4ext/logs/ImmersiveDriving-*.log`. It should say `Hooked vehicle::BaseObject::UpdateVehicleCameraInput` and `Registered native functions`. If the hook is missing, the game version does not match.
 
 Also check that **Enable Drive Modes and Cruise Control**, and **Cars** or **Motorcycles**, are on in the General settings. On a controller the levels only apply with *Shape controller input too* on, see [Keys and Controllers](#keys-and-controllers).
@@ -221,7 +221,7 @@ The game sorts *draw weapon* first, then *change camera*, and *exit vehicle* las
   <summary>Will it break after a game or framework update?</summary>
 &#10240;
 
-- **Game patch:** the plugin only loads on patch 2.31. On another patch RED4ext skips it, and its scripts are not compiled, so driving is simply vanilla until an updated version is released.
+- **Game patch:** the plugin only loads on patch 2.5 (v1.4 is the version for patch 2.31). On another patch RED4ext skips it, and its scripts are not compiled, so driving is simply vanilla until an updated version is released.
 - **RED4ext, redscript, Input Loader or Mod Settings:** tested with the versions listed in the [main README](../README.md#tested-with). Newer versions usually keep working; if the mod stops loading after an update, check the logs described in *Nothing changes while driving* under [Getting It Working](#getting-it-working).
 
 </details>

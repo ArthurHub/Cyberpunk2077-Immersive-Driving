@@ -1,3 +1,7 @@
+## v1.5
+
+- Game: Updated for Cyberpunk 2077 patch 2.5. This version only runs on patch 2.5 and needs the 2.5 versions of RED4ext (1.31), redscript (0.5.32), Input Loader and Mod Settings. Driving, cruise control, the speed limiter and all settings work as in v1.4, and saved settings carry over. Stay on v1.4 for patch 2.31.
+
 ## v1.4
 
 - Drive Modes: New Keep mode after leaving the car (off by default) keeps a mode left on by a toggle key when you get out, so it applies to the next car you drive, with a short reminder when you get in, like the speed limiter. Loading a save still starts with no mode on.

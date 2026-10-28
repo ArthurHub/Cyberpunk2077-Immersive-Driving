@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
   ImmersiveDriving
-  VERSION 1.4.0
+  VERSION 1.5.0
   DESCRIPTION "Configurable immersive driving for Cyberpunk 2077: throttle and steering control, slow turn, cruise control, speed limiter"
   LANGUAGES CXX
 )
@@ -53,11 +53,11 @@ if(IMMERSIVE_DRIVING_BUILD_PLUGIN)
   endif()
 
   include(FetchContent)
-  # RED4ext.SDK master from 2026-07-30 (supports patch 2.31). Set FETCHCONTENT_SOURCE_DIR_RED4EXT_SDK to use a local checkout.
+  # RED4ext.SDK master from 2026-10-24 (supports patch 2.5). Set FETCHCONTENT_SOURCE_DIR_RED4EXT_SDK to use a local checkout.
   FetchContent_Declare(
     RED4ext_SDK
-    URL https://github.com/wopss/RED4ext.SDK/archive/ad7277714ad30d6885d7050c5ba24fa0102f6920.zip
-    URL_HASH SHA256=0dcaf53ff4da4a69ef31069fb0a82e93ffd546b4299b6e727999c57c3d4f7621
+    URL https://github.com/wopss/RED4ext.SDK/archive/5246e659d783e5834cc08a90e56c8932c9ed3449.zip
+    URL_HASH SHA256=ce3c7aa586186ca04bb568db062ef4701210a58d7b59774d35b450b01223ccee
     DOWNLOAD_EXTRACT_TIMESTAMP ON
   )
   FetchContent_MakeAvailable(RED4ext_SDK)

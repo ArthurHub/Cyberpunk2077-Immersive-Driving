@@ -39,13 +39,13 @@ RED4EXT_C_EXPORT void RED4EXT_CALL Query(RED4ext::v1::PluginInfo* info)
     info->name = L"ImmersiveDriving";
     info->author = L"ArthurHub";
     info->version = RED4EXT_V1_SEMVER(IMMERSIVE_DRIVING_VERSION_MAJOR, IMMERSIVE_DRIVING_VERSION_MINOR, IMMERSIVE_DRIVING_VERSION_PATCH);
-    info->runtime = RED4EXT_V1_RUNTIME_VERSION_2_31;
-    // SDK 1.0.0 is compatible with 0.5.0, and RED4ext 1.29.x refuses plugins reporting anything newer.
+    info->runtime = RED4EXT_V1_RUNTIME_VERSION_2_50;
+    // SDK 1.0.0 is compatible with 0.5.0, the minimum SDK version RED4ext 1.31 loads.
     info->sdk = RED4EXT_V1_SDK_VERSION_1_0_0_COMPAT_0_5_0;
 }
 
 RED4EXT_C_EXPORT uint32_t RED4EXT_CALL Supports()
 {
-    // API v0 and v1 are compatible, reporting v0 keeps the plugin loadable by RED4ext 1.29.x as well.
+    // API v0 and v1 are compatible, and RED4ext 1.31 loads plugins reporting either.
     return RED4EXT_API_VERSION_1_COMPAT_0;
 }

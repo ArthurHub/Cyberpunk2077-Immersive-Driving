@@ -43,29 +43,29 @@ What it provides:
 
 ### Requirements
 
-- Cyberpunk 2077 patch 2.31
-- [RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380) 1.29.0 or newer
-- [redscript](https://www.nexusmods.com/cyberpunk2077/mods/1511) 0.5.31
-- [Input Loader](https://www.nexusmods.com/cyberpunk2077/mods/4575), for the mod's key bindings
-- [Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885) 0.2.21 or newer, for in-game configuration (needs [ArchiveXL](https://www.nexusmods.com/cyberpunk2077/mods/4198))
+- Cyberpunk 2077 patch 2.5 (for patch 2.31, use v1.4)
+- [RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380) 1.31.0 or newer
+- [redscript](https://www.nexusmods.com/cyberpunk2077/mods/1511) 0.5.32
+- [Input Loader](https://www.nexusmods.com/cyberpunk2077/mods/4575) 0.2.4 or newer, for the mod's key bindings
+- [Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885) 0.2.22 or newer, for in-game configuration (needs [ArchiveXL](https://www.nexusmods.com/cyberpunk2077/mods/4198))
 
 Without Mod Settings the mod still works with the default settings and keys.
 
 ### Tested with
 
-Tested on the Welcome to Night City (WTNC) Wabbajack mod list, version 2026.1.3, installed with Mod Organizer 2:
+Tested on the Welcome to Night City (WTNC) Wabbajack mod list, version 2026.1.3 with its frameworks updated for patch 2.5, installed with Mod Organizer 2:
 
 | Component | Version |
 | --- | --- |
-| Cyberpunk 2077 (Steam) | 2.31 (3.0.80.51928) |
-| RED4ext | 1.29.1 |
-| redscript | 0.5.31 |
-| Input Loader | 0.2.3 (the DLL reports 0.1.1) |
-| Mod Settings | 0.2.21 |
-| ArchiveXL | 1.26.1 |
-| Codeware | 1.18.1 |
-| TweakXL | 1.11.3 |
-| Cyber Engine Tweaks | 1.37.1 |
+| Cyberpunk 2077 (Steam) | 2.5 (3.0.88.46235) |
+| RED4ext | 1.31.0 |
+| redscript | 0.5.32 |
+| Input Loader | 0.2.6 |
+| Mod Settings | 0.2.27 |
+| ArchiveXL | 1.28.1 |
+| Codeware | 1.21.1 |
+| TweakXL | 1.12.0 |
+| Cyber Engine Tweaks | 1.38.1 |
 
 Codeware, TweakXL and Cyber Engine Tweaks are not required; they are listed because they were part of the tested setup.
 
@@ -108,7 +108,7 @@ Every tick the game zeroes the vehicle's driving inputs and recomputes them from
 - **The speed limiter** runs the same controller as a ceiling on the driver's throttle. It anticipates the limit from the measured acceleration, only learns the throttle that holds the limit while it holds the car back, and after kickdown or a lower limit brings the car down along a ramp so it does not undershoot.
 - **Game state** comes from redscript. It tracks the driver seat through the player state machine, checks the quest driving restrictions, AutoDrive, quickhacks and remote control, forwards the mod's keys, and shows the messages.
 
-The driving input offsets are specific to patch 2.31. They were confirmed by disassembling the game's per-tick input update, and the plugin only loads on that patch.
+The driving input offsets are specific to the game patch. They were confirmed for patch 2.5 by disassembling the game's per-tick input update, and the plugin only loads on that patch.
 
 ## Development
 

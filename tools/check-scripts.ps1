@@ -10,7 +10,7 @@
 #>
 param(
     [string]$GameDir = $env:CYBERPUNK_2077_GAME_DIR,
-    [string]$RedscriptVersion = "0.5.31"
+    [string]$RedscriptVersion = "0.5.32"
 )
 
 $ErrorActionPreference = "Stop"

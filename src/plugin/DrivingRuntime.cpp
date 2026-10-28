@@ -15,9 +15,10 @@ namespace immersive_driving
 {
     namespace
     {
-        // Driving input fields of vehicle::BaseObject in patch 2.31 (Cyberpunk2077.exe 3.0.80.51928). The per-tick
-        // input update at RVA 0x2E54FC zeroes them and writes each one from its input action, then the update at RVA
-        // 0x2E5368 calls UpdateVehicleCameraInput (the hooked function) and hands the vehicle over to consume them.
+        // Driving input fields of vehicle::BaseObject in patch 2.5 (Cyberpunk2077.exe 3.0.88.46235), unchanged since
+        // 2.31. The per-tick input update at RVA 0x1BC03C zeroes them and writes each one from its input action, then
+        // the update at RVA 0x1BBEA8 calls UpdateVehicleCameraInput (the hooked function) and hands the vehicle over to
+        // consume them.
         constexpr std::ptrdiff_t ACCELERATE_OFFSET = 0x264; // Accelerate, 0..1
         constexpr std::ptrdiff_t DECELERATE_OFFSET = 0x268; // Decelerate, 0..1
         constexpr std::ptrdiff_t HANDBRAKE_OFFSET = 0x26C; // Handbrake, 0..1
