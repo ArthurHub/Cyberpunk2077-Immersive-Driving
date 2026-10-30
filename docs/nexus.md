@@ -97,6 +97,9 @@ Cruise down the highway at a steady 60 with the radio on, drift through a lane c
 [*][size=3]Steering wheel plugins and flight mods also rewrite driving inputs every frame and may combine in unexpected ways. Disable the overlapping features in one of them.[/size]
 [/list]
 
+[size=4][b]Optional Mods[/b][/size]
+[size=3]Want the first-person dashboard speedometer in km/h? Install [url=https://www.nexusmods.com/cyberpunk2077/mods/36419]First-Person Speedometer in kmh[/url] and set the game's Interface > Speedometer Units to metric.[/size]
+
 [size=4][b]Source Code[/b][/size]
 [size=3]GitHub: [url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving]ArthurHub/Cyberpunk2077-Immersive-Driving[/url][/size]
 

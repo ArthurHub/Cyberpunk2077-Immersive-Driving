@@ -89,6 +89,14 @@ While cruising, the speedometer can move by one up or down as cruise control cor
 </details>
 
 <details>
+  <summary>Can I show the first-person dashboard speedometer in km/h?</summary>
+&#10240;
+
+Yes. Install [First-Person Speedometer in kmh](https://www.nexusmods.com/cyberpunk2077/mods/36419) and set the game's **Interface > Speedometer Units** to **metric**. It changes the displayed speed to km/h, although the dashboard's mph label remains.
+
+</details>
+
+<details>
   <summary>Why are cruise speeds always steps of 5?</summary>
 &#10240;
 
