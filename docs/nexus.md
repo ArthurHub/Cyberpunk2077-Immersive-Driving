@@ -1,119 +1,156 @@
 # Short description
 
-Calmer keyboard driving with Sport and Gentle modes for throttle, brake and steering, plus real cruise control that holds your speed on any road and a speed limiter. Everything configurable in-game.
+Smoother keyboard driving with Sport and Gentle modes for throttle, braking, and steering. Set a speed limiter for smooth, controlled city driving instead of racing through every street, or use cruise control to maintain a steady pace. Fully configurable in-game.
 
 # Full description
 
-[size=3]Keyboard driving in Night City is all or nothing: holding W floors the throttle, tapping A or D snaps the wheels, and nothing keeps a steady speed. Drive Modes and Cruise Control shapes your driving inputs every frame, right before the car uses them. Throttle, brake and steering stay at calmer levels, a Sport key gives you everything when you need it, a Gentle key gives soft curves and careful parking, cruise control measures your speed and adjusts throttle and brakes to actually hold it, on flat roads, uphill and downhill, and a speed limiter keeps you under a limit you set.[/size]
-[size=3]
-Cruise down the highway at a steady 60 with the radio on, drift through a lane change with a light touch of the steering, and hold Sport the moment a chase starts. All configuration is done in-game and applied immediately, no reloads or restarts.[/size]
+[size=3]Keyboard driving in Night City can feel like all or nothing: W floors the throttle, A and D throw the steering around, and every city street becomes a racetrack.
+
+[b]Drive Modes - Speed Limiter - Cruise Control[/b] makes driving smoother and more controllable, without taking control away from you.
+
+Use the [b]Speed Limiter[/b] to navigate Night City's streets at a sensible speed without flying through every corner. Choose between Default, Sport and Gentle driving modes to control how your car responds to throttle, braking and steering. Or enable [b]Cruise Control[/b] to maintain a steady speed, even uphill and downhill.
+
+Drive naturally through traffic, enjoy the scenery with the radio on, and switch to full Sport when a chase starts.
+
+Everything is configurable in-game, with changes applied immediately, even while driving.[/size]
 
 [size=4][b]Usage[/b][/size]
+
 [list]
-[*][size=3]Drive normally: throttle, brake and steering use the calmer Default levels.[/size]
-[*][size=3]Sport: tap [b]Left Shift[/b] to switch full throttle, brake and steering on and off, or hold it for a moment of Sport.[/size]
-[*][size=3]Gentle: tap [b]Left Alt[/b] to switch soft throttle, brake and steering on and off, or hold it for a moment of Gentle.[/size]
-[*][size=3]While a mode is on, holding its key gives the Default levels until you let go. Prefer plain Hold or Toggle keys? Change them in Key Bindings.[/size]
-[*][size=3]Cruise control on / off: [b]Mouse 5[/b] (front thumb button). Both on one key? Set a key to switch the other one on a long press in Key Bindings.[/size]
-[*][size=3]Speed limiter on / off: [b]Mouse 4[/b] (back thumb button). Hold [b]Left Shift[/b] to pass the limit.[/size]
-[*][size=3]Set speed up / down: [b]Page Up[/b] / [b]Page Down[/b], in steps of 5, for cruise control or the speed limiter, whichever is on. With both off, speed up resumes the last cruise speed and speed down sets the current speed.[/size]
-[*][size=3]What is on stays listed with the game's driving hints while you drive, with the key that switches it off.[/size]
-[*][size=3]Configure everything: [b]Mods > Drive Modes and Cruise Control[/b], from the main menu or the pause menu.[/size]
-[*][size=3]All keys can be rebound in Mod Settings. The mouse wheel works great for cruise speed.[/size]
+[*][size=3][b]Normal driving:[/b] Throttle, braking and steering use the adjustable Default levels.[/size]
+[*][size=3][b]Speed Limiter:[/b] Press [b]Mouse 4[/b] (back thumb button) to toggle. Drive normally, but the car won't accelerate beyond your chosen limit. Hold [b]Left Shift[/b] (Sport) to temporarily override it.[/size]
+[*][size=3][b]Sport:[/b] Tap [b]Left Shift[/b] to toggle full throttle, braking and steering, or hold it for temporary Sport.[/size]
+[*][size=3][b]Gentle:[/b] Tap [b]Left Alt[/b] to toggle softer throttle, braking and steering, or hold it for precise driving and parking.[/size]
+[*][size=3][b]Cruise Control:[/b] Press [b]Mouse 5[/b] (front thumb button) to toggle automatic speed control.[/size]
+[*][size=3][b]Adjust speed:[/b] Use [b]Page Up[/b] / [b]Page Down[/b] in steps of 5. This adjusts whichever speed feature is active. With both off, speed up resumes the previous cruise speed and speed down sets the current speed.[/size]
+[*][size=3][b]Configure:[/b] Open [b]Mods > Drive Modes and Cruise Control[/b] from the main menu or pause menu.[/size]
 [/list]
 
+[size=3]Sport and Gentle keys support tap-to-toggle, hold, or both. When a mode is toggled on, holding its key temporarily returns to Default. All keys can be rebound, and you can even combine Cruise Control and Speed Limiter on one key using short and long presses.
+
+Active modes and speed controls appear alongside the game's driving hints, including the key to switch them off.
+
+[b]Controller tip:[/b] Set Default to Gentle values and bind Sport to D-pad Up. This gives you Gentle-like driving normally and Sport with just one button. D-pad Left also works for tap bindings, but holding it opens CrystalCoat. If you enable steering adjustments for controllers, use 100% steering in all modes and 0s steering time to avoid stiff analog steering.[/size]
+
 [size=4][b]Features[/b][/size]
-[size=3]Drive Modes:[/size]
+
+[size=3][b]Speed Limiter[/b]
+
+The easiest way to drive through Night City without treating every street like a racetrack.[/size]
+
 [list]
-[*][size=3]Default, Sport and Gentle levels for throttle, brake and steering, each adjustable from 0 to 100%.[/size]
-[*][size=3]Out of the box: Default 60% throttle, 50% brake, 75% steering. Sport 100% everything. Gentle 25% throttle, 25% brake, 50% steering.[/size]
-[*][size=3]Instant response, no build-up delay. One mode at a time: toggling one on switches the other off, and holding a key overrides a toggled mode while held.[/size]
-[*][size=3]Each mode key can be held, toggled, or both (tap to toggle, hold for hold), set separately for Sport and Gentle.[/size]
-[*][size=3]A mode switched on with a tap can stay on when you get out and apply to the next car you drive.[/size]
+[*][size=3]Drive normally while the limiter automatically reduces throttle as you approach your chosen maximum speed.[/size]
+[*][size=3]Enabling it while moving sets the limit to your current speed, rounded up to the next step of 5, so it won't suddenly slow you down.[/size]
+[*][size=3]When parked, it uses your previous limit or a configurable default.[/size]
+[*][size=3]Hold Sport to temporarily exceed the limit. Release it to return to the limit (configurable).[/size]
+[*][size=3]Light automatic braking prevents overspeeding downhill.[/size]
+[*][size=3]Unlike Cruise Control, the limiter stays active when you brake, stop or crash. It can even remember its state when changing vehicles.[/size]
 [/list]
-[size=3]Steering:[/size]
+
+[size=3][b]Drive Modes[/b]
+
+Three independently configurable driving modes, each with adjustable throttle, braking and steering strength (0–100%).[/size]
+
 [list]
-[*][size=3]Smooth steering: builds up while you hold a direction, so short taps make small corrections. Letting go is always instant.[/size]
-[*][size=3]Speed-sensitive steering: gradually less Default and Gentle steering at high speed, for stable lane changes and long highway curves.[/size]
-[*][size=3]Fixes the vanilla lean keys cutting your steering: while Sport or Gentle is held on Left Shift or Left Ctrl, you get full steering and no unwanted lean.[/size]
+[*][size=3][b]Default:[/b] 60% throttle, 50% braking, 75% steering.[/size]
+[*][size=3][b]Sport:[/b] 100% everything for maximum response.[/size]
+[*][size=3][b]Gentle:[/b] 25% throttle, 25% braking, 50% steering for relaxed driving and careful maneuvering.[/size]
+[*][size=3]Instant response with no throttle or brake build-up delay.[/size]
+[*][size=3]Toggle or hold modes independently. Activating one replaces the other, and holding a key temporarily overrides the active mode.[/size]
+[*][size=3]Optionally remember a toggled mode when leaving a vehicle, so it's ready for the next one.[/size]
 [/list]
-[size=3]Cruise Control:[/size]
+
+[size=3][b]Steering[/b][/size]
+
 [list]
-[*][size=3]Holds the set speed with a real feedback controller, tuned for sports cars, trucks and motorcycles on flat roads and hills.[/size]
-[*][size=3]Speed up and down in steps of 5, with a smooth speed change rate.[/size]
-[*][size=3]Accelerate to overtake, and it returns to the cruise speed when you let go (or adopts the new speed, your choice).[/size]
-[*][size=3]Brakes lightly downhill so the car doesn't run away.[/size]
-[*][size=3]Switches off for braking, the handbrake, crashes, getting stuck in traffic, scenes, AutoDrive, quickhacks and leaving the driver seat.[/size]
-[*][size=3]Speeds match your car's dashboard or the HUD speedometer, or use true km/h or mph.[/size]
-[*][size=3]Short on-screen messages and a click confirm every change, both optional.[/size]
+[*][size=3][b]Smooth steering:[/b] Steering builds up while a direction is held, making short taps useful for small corrections. Releasing the key is always instant.[/size]
+[*][size=3][b]Speed-sensitive steering:[/b] Reduces Default and Gentle steering at higher speeds for more stable lane changes and highway curves.[/size]
+[*][size=3]Prevents the game's lean controls from interfering with steering when Sport or Gentle uses Left Shift or Left Ctrl.[/size]
 [/list]
-[size=3]Speed Limiter:[/size]
+
+[size=3][b]Cruise Control[/b]
+
+Set your speed and let the car handle the throttle and brakes.[/size]
+
 [list]
-[*][size=3]Keeps the car from going faster than the limit: drive as usual, and the throttle eases off so the car settles on the limit instead of passing it.[/size]
-[*][size=3]Switches on at your current speed rounded up to a step of 5, so it never slows you down. Parked, it uses the last limit or a default limit you choose.[/size]
-[*][size=3]Hold the Sport key to pass the limit, and the car returns to the limit when you let go (can be turned off).[/size]
-[*][size=3]Brakes lightly downhill, and never switches off for braking or crashes.[/size]
-[*][size=3]Stays on when you get out and limits the next car you drive (can be turned off).[/size]
+[*][size=3]Uses a feedback controller to maintain speed on flat roads, uphill and downhill, tuned for sports cars, trucks and motorcycles.[/size]
+[*][size=3]Adjust speed in steps of 5 with smooth acceleration and deceleration.[/size]
+[*][size=3]Accelerate to overtake, then return to the set speed or adopt the new speed (configurable).[/size]
+[*][size=3]Automatically applies light braking downhill.[/size]
+[*][size=3]Disengages when braking, using the handbrake, crashing, getting stuck in traffic, entering scenes, using AutoDrive or quickhacks, or leaving the driver's seat.[/size]
+[*][size=3]Choose dashboard/HUD speed units or true km/h or mph.[/size]
+[*][size=3]Optional on-screen notifications and sounds confirm changes.[/size]
 [/list]
-[size=3]Configuration:[/size]
+
+[size=3][b]Configuration and Integration[/b][/size]
+
 [list]
-[*][size=3]Every value and key binding in Mod Settings, applied as soon as you accept, even while driving.[/size]
-[*][size=3]Cruise control and the speed limiter fit on one key: a short press for one, a long press for the other.[/size]
-[*][size=3]On-screen indicators for cruise control, the speed limiter and a toggled mode, in the game's own driving hints (optional), first, last or after the game's hints so they fit next to other vehicle mods.[/size]
-[*][size=3]The game's exit vehicle hint can be hidden to make room when other mods fill the hint list.[/size]
-[*][size=3]Cars and motorcycles can be switched on or off separately.[/size]
-[*][size=3]Controller friendly: levels apply to keyboard driving by default, cruise control and the speed limiter work with any device.[/size]
+[*][size=3]Configure every value and key binding in-game through Mod Settings, with immediate results and no reloads or restarts.[/size]
+[*][size=3]Combine Speed Limiter and Cruise Control on one key using short and long presses.[/size]
+[*][size=3]Optional indicators for active modes, Cruise Control and Speed Limiter appear in the game's driving hints. Choose their position to coexist with other vehicle mods.[/size]
+[*][size=3]Optionally hide the game's exit vehicle hint to make room for additional indicators.[/size]
+[*][size=3]Enable or disable the mod separately for cars and motorcycles.[/size]
+[*][size=3]Controller friendly: driving mode input adjustments affect keyboards by default, while Speed Limiter and Cruise Control work with any input device.[/size]
 [/list]
 
 [size=4][b]Documentation[/b][/size]
 [list]
-[*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/README.md]Usage and Configuration Guide[/url] — drive modes, cruise control, the speed limiter, speed units, and every setting with its default.[/size]
+[*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/README.md]Usage and Configuration Guide[/url] — all features, settings, speed units and defaults.[/size]
 [*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/faq.md]FAQ and Troubleshooting[/url][/size]
 [*][size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving/blob/main/docs/changelog.md]Changelog[/url][/size]
 [/list]
 
-[b][size=4]Installation[/size][/b]
-[size=3]Requirements[/size]
+[size=4][b]Installation[/b][/size]
+
+[size=3][b]Requirements[/b][/size]
 [list]
-[*][size=3]Cyberpunk 2077 patch 2.5 (for patch 2.31, use v1.4 from the old files)[/size]
-[*][url=https://www.nexusmods.com/cyberpunk2077/mods/2380][size=3]RED4ext[/size][/url] [size=3]1.31 or newer[/size]
-[*][url=https://www.nexusmods.com/cyberpunk2077/mods/1511][size=3]redscript[/size][/url] [size=3]0.5.32[/size]
-[*][url=https://www.nexusmods.com/cyberpunk2077/mods/4575][size=3]Input Loader[/size][/url]
-[*][url=https://www.nexusmods.com/cyberpunk2077/mods/4885][size=3]Mod Settings[/size][/url] [size=3](and its requirement [url=https://www.nexusmods.com/cyberpunk2077/mods/4198]ArchiveXL[/url]) for in-game configuration[/size]
+[*][size=3]Cyberpunk 2077 patch 2.5 (for patch 2.31, use v1.4 from Old Files)[/size]
+[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/2380]RED4ext[/url] 1.31 or newer[/size]
+[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/1511]redscript[/url] 0.5.32[/size]
+[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/4575]Input Loader[/url][/size]
+[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/4885]Mod Settings[/url] (and its requirement [url=https://www.nexusmods.com/cyberpunk2077/mods/4198]ArchiveXL[/url]) for in-game configuration[/size]
 [/list]
-[size=3]Tested with[/size]
+
+[size=3][b]Steps[/b][/size]
 [list]
-[*][size=3]The Welcome to Night City (WTNC) Wabbajack mod list, version 2026.1.3 with its frameworks updated for patch 2.5, with Mod Organizer 2.[/size]
+[*][size=3]Install with your mod manager, or extract into the game folder containing bin, r6 and red4ext.[/size]
+[*][size=3]Safe to install or remove at any time. The mod doesn't modify save files.[/size]
+[/list]
+
+[size=3][b]Tested With[/b][/size]
+[list]
+[*][size=3]Welcome to Night City (WTNC) Wabbajack mod list 2026.1.3, with frameworks updated for patch 2.5, using Mod Organizer 2.[/size]
 [*][size=3]Cyberpunk 2077 2.5 (Steam), RED4ext 1.31.0, redscript 0.5.32, Input Loader 0.2.6, Mod Settings 0.2.27, ArchiveXL 1.28.1, Codeware 1.21.1, TweakXL 1.12.0, Cyber Engine Tweaks 1.38.1.[/size]
 [/list]
-[size=3]Steps[/size]
+
+[size=3][b]Incompatibilities[/b][/size]
 [list]
-[*][size=3]Install with your mod manager, or extract into the game folder (the one that contains bin, r6 and red4ext).[/size]
-[*][size=3]Safe to add or remove at any time, it does not change saves.[/size]
-[/list]
-[size=3]Incompatibilities[/size]
-[list]
-[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/5293]Immersive Driving[/url] and other mods that replace the game's input files (inputUserMappings.xml, inputContexts.xml) stop Input Loader from adding this mod's keys. Remove them.[/size]
-[*][size=3]Steering wheel plugins and flight mods also rewrite driving inputs every frame and may combine in unexpected ways. Disable the overlapping features in one of them.[/size]
+[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/5293]Immersive Driving[/url] and other mods that replace inputUserMappings.xml or inputContexts.xml prevent Input Loader from adding this mod's keys. Remove conflicting replacements.[/size]
+[*][size=3]Steering wheel plugins and flight mods may also modify driving inputs every frame. Disable overlapping features if you experience unexpected behavior.[/size]
 [/list]
 
 [size=4][b]Optional Mods[/b][/size]
-[size=3]Want the first-person dashboard speedometer in km/h? Install [url=https://www.nexusmods.com/cyberpunk2077/mods/36419]First-Person Speedometer in kmh[/url] and set the game's Interface > Speedometer Units to metric.[/size]
+
+[size=3]Want the first-person dashboard speedometer in km/h? Install [url=https://www.nexusmods.com/cyberpunk2077/mods/36419]First-Person Speedometer in kmh[/url] and set Interface > Speedometer Units to metric.[/size]
 
 [size=4][b]Source Code[/b][/size]
-[size=3]GitHub: [url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving]ArthurHub/Cyberpunk2077-Immersive-Driving[/url][/size]
+
+[size=3][url=https://github.com/ArthurHub/Cyberpunk2077-Immersive-Driving]ArthurHub/Cyberpunk2077-Immersive-Driving on GitHub[/url][/size]
 
 [size=4][b]Support[/b][/size]
-If you like my work, consider helping out.
+
+[size=3]If you like my work, consider [url=https://patreon.com/theartofdev]supporting me on Patreon[/url].[/size]
 [url=https://patreon.com/theartofdev][img]https://camo.githubusercontent.com/932ed7c82e6cf6c653059af7f533f1aba02ce4f3da0238f3a95da5815985ee2f/68747470733a2f2f7468656172746f666465762e776f726470726573732e636f6d2f77702d636f6e74656e742f75706c6f6164732f323032352f30362f6265636f6d655f615f706174726f6e5f627574746f6e2e706e67[/img][/url]
 
-[size=3][b]Made with AI:[/b] this mod was mostly created by Claude, Anthropic's AI assistant: the code, the reverse engineering of the driving inputs, and the documentation. I directed the design and tested it in-game.[/size]
+[size=3][b]Made with AI:[/b] This mod was mostly created by Claude, Anthropic's AI assistant, including the code, reverse engineering of driving inputs, and documentation. I directed the design and tested it in-game.[/size]
 
 [size=4][b]Credits / Thanks[/b][/size]
-This mod is built on the work of the Cyberpunk 2077 modding community and public code.
+
+[size=3]Built on the work of the Cyberpunk 2077 modding community and publicly available code.[/size]
+
 [list]
-[*][url=https://www.nexusmods.com/cyberpunk2077/mods/5293]Immersive Driving[/url] by Jo3yization, the inspiration for this mod.
-[*]jackhumbert for Let There Be Flight, whose vehicle input research this builds on, and for Mod Settings and Input Loader.
-[*]natpoh for the [url=https://github.com/natpoh/cp2077-wheel-mod-moza]steering wheel plugin[/url] that probed the 2.31 driving input offsets.
-[*]WopsS for RED4ext, jac3km4 for redscript, and psiberx for ArchiveXL.
+[*][size=3][url=https://www.nexusmods.com/cyberpunk2077/mods/5293]Immersive Driving[/url] by Jo3yization, the inspiration for this mod.[/size]
+[*][size=3]jackhumbert for Let There Be Flight, whose vehicle input research this builds on, and for Mod Settings and Input Loader.[/size]
+[*][size=3]natpoh for the [url=https://github.com/natpoh/cp2077-wheel-mod-moza]steering wheel plugin[/url] that probed patch 2.31 driving input offsets.[/size]
+[*][size=3]WopsS for RED4ext, jac3km4 for redscript, and psiberx for ArchiveXL.[/size]
 [/list]
