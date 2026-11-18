@@ -72,8 +72,21 @@ namespace
         VehicleModel vehicle;
         TickContext context;
 
+        /**
+         * Pins the levels and steer-in times the checks are written against, so tuning the shipped defaults in Config
+         * does not change what the tests expect.
+         */
         Rig()
         {
+            config.throttleGentlePct = 25;
+            config.brakeNormalPct = 50;
+            config.brakeGentlePct = 25;
+            config.steerNormalPct = 75;
+            config.steerGentlePct = 50;
+            config.steerRiseNormalSec = 0.3f;
+            config.steerRiseSportSec = 0.3f;
+            config.steerRiseGentleSec = 0.3f;
+
             context.deltaTime = DT;
             context.drivingAllowed = true;
             context.vehicleKind = VehicleKind::Car;

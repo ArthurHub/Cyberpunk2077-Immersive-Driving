@@ -52,9 +52,9 @@ The easiest way to drive through Night City without treating every street like a
 Three independently configurable driving modes, each with adjustable throttle, braking and steering strength (0–100%).[/size]
 
 [list]
-[*][size=3][b]Default:[/b] 60% throttle, 50% braking, 75% steering.[/size]
+[*][size=3][b]Default:[/b] 60% throttle, 70% braking, 80% steering.[/size]
 [*][size=3][b]Sport:[/b] 100% everything for maximum response.[/size]
-[*][size=3][b]Gentle:[/b] 25% throttle, 25% braking, 50% steering for relaxed driving and careful maneuvering.[/size]
+[*][size=3][b]Gentle:[/b] 35% throttle, 50% braking, 70% steering for relaxed driving and careful maneuvering.[/size]
 [*][size=3]Instant response with no throttle or brake build-up delay.[/size]
 [*][size=3]Toggle or hold modes independently. Activating one replaces the other, and holding a key temporarily overrides the active mode.[/size]
 [*][size=3]Optionally remember a toggled mode when leaving a vehicle, so it's ready for the next one.[/size]

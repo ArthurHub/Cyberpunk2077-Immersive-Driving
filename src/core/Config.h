@@ -27,20 +27,20 @@ namespace immersive_driving
         // holding the Gentle key. Sport wins when both are held.
         int throttleNormalPct = 60;
         int throttleSportPct = 100;
-        int throttleGentlePct = 25;
-        int brakeNormalPct = 50;
+        int throttleGentlePct = 35;
+        int brakeNormalPct = 70;
         int brakeSportPct = 100;
-        int brakeGentlePct = 25;
-        int steerNormalPct = 75;
+        int brakeGentlePct = 50;
+        int steerNormalPct = 80;
         int steerSportPct = 100;
-        int steerGentlePct = 50;
+        int steerGentlePct = 70;
 
         // Advanced steering
         bool steeringSmoothing = true;
         // Steer-in time for each mode, like the levels above: normal, Sport and Gentle.
-        float steerRiseNormalSec = 0.3f;
+        float steerRiseNormalSec = 0.5f;
         float steerRiseSportSec = 0.3f;
-        float steerRiseGentleSec = 0.3f;
+        float steerRiseGentleSec = 0.7f;
         bool speedSensitiveSteering = true;
         float fullSteerBelowKmh = 40.0f;
         float highSpeedKmh = 140.0f;

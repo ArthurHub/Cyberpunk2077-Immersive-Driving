@@ -174,7 +174,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
-  public let throttleGentlePct: Int32 = 25;
+  public let throttleGentlePct: Int32 = 35;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
@@ -184,7 +184,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
-  public let brakeNormalPct: Int32 = 50;
+  public let brakeNormalPct: Int32 = 70;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
@@ -204,7 +204,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
-  public let brakeGentlePct: Int32 = 25;
+  public let brakeGentlePct: Int32 = 50;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
@@ -214,7 +214,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
-  public let steerNormalPct: Int32 = 75;
+  public let steerNormalPct: Int32 = 80;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
@@ -234,7 +234,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
-  public let steerGentlePct: Int32 = 50;
+  public let steerGentlePct: Int32 = 70;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Throttle, Brake and Steering")
@@ -262,7 +262,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "2.0")
   @runtimeProperty("ModSettings.step", "0.05")
   @runtimeProperty("ModSettings.dependency", "steeringSmoothing")
-  public let steerRiseNormalSec: Float = 0.3;
+  public let steerRiseNormalSec: Float = 0.5;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Advanced Steering")
@@ -284,7 +284,7 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "2.0")
   @runtimeProperty("ModSettings.step", "0.05")
   @runtimeProperty("ModSettings.dependency", "steeringSmoothing")
-  public let steerRiseGentleSec: Float = 0.3;
+  public let steerRiseGentleSec: Float = 0.7;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Advanced Steering")

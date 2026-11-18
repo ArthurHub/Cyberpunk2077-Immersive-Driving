@@ -32,7 +32,7 @@ This mod works one level deeper. A native plugin sees what the game computed fro
 
 What it provides:
 
-- **Default, Sport and Gentle levels** - throttle, brake and steering each have three levels: Default (60%, 50% and 75% by default), Sport (100%) and Gentle (25%, 25% and 50%), each switched on with a tap of its key or held for a moment.
+- **Default, Sport and Gentle levels** - throttle, brake and steering each have three levels: Default (60%, 70% and 80% by default), Sport (100%) and Gentle (35%, 50% and 70%), each switched on with a tap of its key or held for a moment.
 - **Smooth, speed-sensitive steering** - steering eases in while you hold a direction, so short taps make small corrections, and is gradually reduced at high speed for stable lane changes. Letting go is instant.
 - **Cruise control that holds speed** - on, off, speed up and down in steps of 5, and resume, like a real car. Accelerating overtakes and then returns to the cruise speed (or adopts the new one), braking or the handbrake cancels, and it brakes lightly downhill so it does not run away.
 - **Speed limiter** - switches on at the current speed rounded up to a step of 5, eases the throttle off before the limit instead of cutting it at the limit, brakes lightly downhill, and lets you pass the limit while holding the Sport key. It stays on for the next car you drive.
