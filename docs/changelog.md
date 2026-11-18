@@ -1,3 +1,7 @@
+## v1.6
+
+- Drive Modes: New *Cycle* setting for the Sport and Gentle Mode keys, so one key covers both modes. On the Sport key, each press steps to Sport, then Gentle, then back to Default (the Gentle key starts with Gentle).
+
 ## v1.5
 
 - Game: Updated for Cyberpunk 2077 patch 2.5. This version only runs on patch 2.5 and needs the 2.5 versions of RED4ext (1.31), redscript (0.5.32), Input Loader and Mod Settings. Driving, cruise control, the speed limiter and all settings work as in v1.4, and saved settings carry over. Stay on v1.4 for patch 2.31.

@@ -462,9 +462,9 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   // Drive modes
 
   // A mode key works while held, switches its mode on and off, or both: a short tap toggles and a longer press holds
-  // (Key Bindings). Switching one mode on with a toggle switches the other toggled mode off. A held key overrides a
-  // toggled mode only while held. While the player is not really driving (AutoDrive, scene, quickhack) the keys do not
-  // toggle, so no mode is announced that does not apply.
+  // (Key Bindings). A Cycle key steps through both modes on its own. Switching one mode on with a toggle switches the
+  // other toggled mode off. A held key overrides a toggled mode only while held. While the player is not really driving
+  // (AutoDrive, scene, quickhack) the keys do not toggle, so no mode is announced that does not apply.
   private func OnModeKey(action: ListenerAction, sport: Bool) -> Void {
     let pressed: Bool = ListenerAction.IsButtonJustPressed(action);
     if !pressed && !ListenerAction.IsButtonJustReleased(action) {
@@ -475,7 +475,7 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
 
     let mode: ImmersiveDrivingKeyMode = this.GetKeyMode(sport);
     let now: Float = EngineTime.ToFloat(GameInstance.GetSimTime(this.GetGameInstance()));
-    let toggle: Bool = pressed && Equals(mode, ImmersiveDrivingKeyMode.Toggle);
+    let toggle: Bool = pressed && !this.IsHoldKey(sport);
     if sport {
       this.sportKeyHeld = pressed;
       if pressed {
@@ -492,7 +492,10 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
       }
     }
 
-    if toggle && this.drivingAllowed {
+    if toggle && this.drivingAllowed && Equals(mode, ImmersiveDrivingKeyMode.Cycle) {
+      this.CycleModes(sport);
+      this.PlayClick();
+    } else if toggle && this.drivingAllowed {
       let active: Bool;
       if sport {
         this.sportToggled = !this.sportToggled;
@@ -514,8 +517,36 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     this.PushModes();
   }
 
+  // Steps a Cycle key through its own mode, then the other mode, then default levels, and announces the step.
+  private func CycleModes(sportFirst: Bool) -> Void {
+    let firstOn: Bool = sportFirst ? this.sportToggled : this.gentleToggled;
+    let secondOn: Bool = sportFirst ? this.gentleToggled : this.sportToggled;
+    let nextFirst: Bool = !firstOn && !secondOn;
+    let nextSecond: Bool = firstOn;
+    this.sportToggled = sportFirst ? nextFirst : nextSecond;
+    this.gentleToggled = sportFirst ? nextSecond : nextFirst;
+    if this.sportToggled {
+      this.Notify("Sport mode on");
+    } else if this.gentleToggled {
+      this.Notify("Gentle mode on");
+    } else {
+      this.Notify((sportFirst ? "Gentle" : "Sport") + " mode off");
+    }
+  }
+
   private func GetKeyMode(sport: Bool) -> ImmersiveDrivingKeyMode {
     return sport ? this.settings.sportKeyMode : this.settings.gentleKeyMode;
+  }
+
+  // Whether holding the key gives its mode (Hold, Tap or hold). Toggle and Cycle keys only act on the press.
+  private func IsHoldKey(sport: Bool) -> Bool {
+    let mode: ImmersiveDrivingKeyMode = this.GetKeyMode(sport);
+    return Equals(mode, ImmersiveDrivingKeyMode.Hold) || Equals(mode, ImmersiveDrivingKeyMode.TapOrHold);
+  }
+
+  // Whether some key can switch the mode off once it is toggled on: its own key unless that is Hold, or a Cycle key.
+  private func CanToggleOff(sport: Bool) -> Bool {
+    return NotEquals(this.GetKeyMode(sport), ImmersiveDrivingKeyMode.Hold) || Equals(this.GetKeyMode(!sport), ImmersiveDrivingKeyMode.Cycle);
   }
 
   // Sends the active modes to the plugin, with whether each key is physically down (only a held key can be a vanilla
@@ -524,8 +555,8 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
   private func PushModes() -> Void {
     let sportInverted: Bool = this.IsHoldInverted(true);
     let gentleInverted: Bool = this.IsHoldInverted(false);
-    let sportHold: Bool = this.sportKeyHeld && NotEquals(this.GetKeyMode(true), ImmersiveDrivingKeyMode.Toggle) && !sportInverted;
-    let gentleHold: Bool = this.gentleKeyHeld && NotEquals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.Toggle) && !gentleInverted;
+    let sportHold: Bool = this.sportKeyHeld && this.IsHoldKey(true) && !sportInverted;
+    let gentleHold: Bool = this.gentleKeyHeld && this.IsHoldKey(false) && !gentleInverted;
     ImmersiveDriving_SetSport(sportHold || (this.sportToggled && !gentleHold && !sportInverted), this.sportKeyHeld);
     ImmersiveDriving_SetGentle(gentleHold || (this.gentleToggled && !sportHold && !gentleInverted), this.gentleKeyHeld);
 
@@ -555,13 +586,14 @@ public class ImmersiveDrivingSystem extends ScriptableSystem {
     ImmersiveDriving_SetGentle(false, false);
   }
 
-  // A mode that a toggle left on switches off when that key is changed to hold, which would never release it. The plugin
-  // only notices a disabled speed limiter while driving, so a limiter left on after leaving the car is switched off here.
+  // A mode that a toggle left on switches off when no key can switch it off any more (its key changed to hold, and no
+  // Cycle key). The plugin only notices a disabled speed limiter while driving, so a limiter left on after leaving the
+  // car is switched off here.
   public func OnSettingsChanged() -> Void {
-    if Equals(this.GetKeyMode(true), ImmersiveDrivingKeyMode.Hold) {
+    if !this.CanToggleOff(true) {
       this.sportToggled = false;
     }
-    if Equals(this.GetKeyMode(false), ImmersiveDrivingKeyMode.Hold) {
+    if !this.CanToggleOff(false) {
       this.gentleToggled = false;
     }
     // A mode kept from an earlier car has nothing to keep it once the setting is off.

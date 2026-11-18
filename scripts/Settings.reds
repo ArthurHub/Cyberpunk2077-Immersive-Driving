@@ -18,7 +18,8 @@ enum ImmersiveDrivingAfterOverride {
 enum ImmersiveDrivingKeyMode {
   Hold = 0,
   Toggle = 1,
-  TapOrHold = 2
+  TapOrHold = 2,
+  Cycle = 3
 }
 
 // What the cruise control and speed limiter keys do on a short and on a long press. A key with nothing on its long
@@ -466,10 +467,11 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Key Bindings")
   @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Sport Mode key")
-  @runtimeProperty("ModSettings.description", "Hold: Sport mode while the key is held. Toggle: press to switch Sport mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Sport mode only while held, or default levels while held when Sport mode is on. A toggled mode also switches off when you leave the driver seat.")
+  @runtimeProperty("ModSettings.description", "Hold: Sport mode while the key is held. Toggle: press to switch Sport mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Sport mode only while held, or default levels while held when Sport mode is on. Cycle: each press steps to Sport mode, then Gentle mode, then back to default levels, so one key covers both modes. A toggled mode also switches off when you leave the driver seat.")
   @runtimeProperty("ModSettings.displayValues.Hold", "Hold")
   @runtimeProperty("ModSettings.displayValues.Toggle", "Toggle")
   @runtimeProperty("ModSettings.displayValues.TapOrHold", "Tap or hold")
+  @runtimeProperty("ModSettings.displayValues.Cycle", "Cycle Sport, Gentle")
   public let sportKeyMode: ImmersiveDrivingKeyMode = ImmersiveDrivingKeyMode.TapOrHold;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
@@ -483,10 +485,11 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Key Bindings")
   @runtimeProperty("ModSettings.category.order", "5")
   @runtimeProperty("ModSettings.displayName", "Gentle Mode key")
-  @runtimeProperty("ModSettings.description", "Hold: Gentle mode while the key is held. Toggle: press to switch Gentle mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Gentle mode only while held, or default levels while held when Gentle mode is on. A toggled mode also switches off when you leave the driver seat.")
+  @runtimeProperty("ModSettings.description", "Hold: Gentle mode while the key is held. Toggle: press to switch Gentle mode on, press again to switch it off. Tap or hold: a short tap toggles, holding the key gives Gentle mode only while held, or default levels while held when Gentle mode is on. Cycle: each press steps to Gentle mode, then Sport mode, then back to default levels, so one key covers both modes. A toggled mode also switches off when you leave the driver seat.")
   @runtimeProperty("ModSettings.displayValues.Hold", "Hold")
   @runtimeProperty("ModSettings.displayValues.Toggle", "Toggle")
   @runtimeProperty("ModSettings.displayValues.TapOrHold", "Tap or hold")
+  @runtimeProperty("ModSettings.displayValues.Cycle", "Cycle Gentle, Sport")
   public let gentleKeyMode: ImmersiveDrivingKeyMode = ImmersiveDrivingKeyMode.TapOrHold;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")

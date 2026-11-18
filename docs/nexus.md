@@ -26,7 +26,7 @@ Everything is configurable in-game, with changes applied immediately, even while
 [*][size=3][b]Configure:[/b] Open [b]Mods > Drive Modes and Cruise Control[/b] from the main menu or pause menu.[/size]
 [/list]
 
-[size=3]Sport and Gentle keys support tap-to-toggle, hold, or both. When a mode is toggled on, holding its key temporarily returns to Default. All keys can be rebound, and you can even combine Cruise Control and Speed Limiter on one key using short and long presses.
+[size=3]Sport and Gentle keys support tap-to-toggle, hold, or both, or one key can cycle through Sport, Gentle and Default. When a mode is toggled on, holding its key temporarily returns to Default. All keys can be rebound, and you can even combine Cruise Control and Speed Limiter on one key using short and long presses.
 
 Active modes and speed controls appear alongside the game's driving hints, including the key to switch them off.
 
