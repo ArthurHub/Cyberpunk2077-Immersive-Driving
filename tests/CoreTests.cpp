@@ -119,11 +119,13 @@ namespace
     void testConfig()
     {
         Config config;
-        CHECK(config.setFloat("steerRiseSec", 1.5f));
-        CHECK_NEAR(config.steerRiseSec, 1.5f, 1e-6);
-        CHECK(config.setFloat("steerRiseSec", 1000.0f));
-        CHECK_NEAR(config.steerRiseSec, 5.0f, 1e-6);
-        CHECK(!config.setFloat("steerRiseSec", std::numeric_limits<float>::quiet_NaN()));
+        CHECK(config.setFloat("steerRiseNormalSec", 1.5f));
+        CHECK_NEAR(config.steerRiseNormalSec, 1.5f, 1e-6);
+        CHECK(config.setFloat("steerRiseSportSec", 1000.0f));
+        CHECK_NEAR(config.steerRiseSportSec, 5.0f, 1e-6);
+        CHECK(config.setFloat("steerRiseGentleSec", -1.0f));
+        CHECK_NEAR(config.steerRiseGentleSec, 0.0f, 1e-6);
+        CHECK(!config.setFloat("steerRiseNormalSec", std::numeric_limits<float>::quiet_NaN()));
         CHECK(config.setInt("steerGentlePct", -20));
         CHECK(config.steerGentlePct == 0);
         CHECK(config.setInt("throttleSportPct", 150));
@@ -137,8 +139,9 @@ namespace
         CHECK(config.limiterMaxBrakePct == 100);
         CHECK(!config.setBool("doesNotExist", true));
         CHECK(!config.setFloat("enabled", 1.0f));
-        CHECK(!config.setInt("steerRiseSec", 1));
+        CHECK(!config.setInt("steerRiseNormalSec", 1));
         // Removed settings are unknown.
+        CHECK(!config.setFloat("steerRiseSec", 1.0f));
         CHECK(!config.setFloat("throttleRiseSec", 1.0f));
         CHECK(!config.setBool("throttleSmoothing", true));
         CHECK(!config.setInt("slowTurnStrengthPct", 50));
@@ -287,6 +290,33 @@ namespace
         CHECK_NEAR(result.output.steer, 0.5f * 0.65f, 1e-3);
         rig.context.sport = true;
         result = rig.stepFor(0.5f);
+        CHECK_NEAR(result.output.steer, 1.0f, 1e-4);
+    }
+
+    void testSteerInPerMode()
+    {
+        Rig rig;
+        rig.config.steerRiseSportSec = 0.1f;
+        rig.config.steerRiseGentleSec = 0.6f;
+
+        // Gentle builds up to its 50% level in its own 0.6 s.
+        rig.context.gentle = true;
+        rig.context.game.steer = 1.0f;
+        auto result = rig.stepFor(0.3f);
+        CHECK_NEAR(result.output.steer, 0.25f, 0.02f);
+        result = rig.stepFor(0.35f);
+        CHECK_NEAR(result.output.steer, 0.5f, 1e-4);
+
+        // Switching to Sport partway through a Default ramp continues at the Sport rate (full lock in 0.1 s), well
+        // before the Default rate would get there.
+        rig.context.gentle = false;
+        rig.context.game.steer = 0.0f;
+        rig.step();
+        rig.context.game.steer = 1.0f;
+        result = rig.stepFor(0.15f);
+        CHECK_NEAR(result.output.steer, 0.375f, 0.02f);
+        rig.context.sport = true;
+        result = rig.stepFor(0.07f);
         CHECK_NEAR(result.output.steer, 1.0f, 1e-4);
     }
 
@@ -880,6 +910,7 @@ int main()
         { "gamepad pass-through", testGamepadPassThrough },
         { "disabled follows game", testDisabledFollowsGame },
         { "steering", testSteering },
+        { "steer-in per mode", testSteerInPerMode },
         { "lean pairing", testLeanPairing },
         { "cruise engage rules", testCruiseEngageRules },
         { "cruise holds speed", testCruiseHoldsSpeed },

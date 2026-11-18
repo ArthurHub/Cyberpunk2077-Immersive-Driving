@@ -44,7 +44,7 @@ game per-tick input update ─────────────────�
 | Path | Role |
 | --- | --- |
 | `src/core/Config.*` | Every native tunable; `setBool/setFloat/setInt` by field name, clamped. Names match `scripts/Settings.reds`. |
-| `src/core/DriveController.*` | Pure logic: Default/Sport/Gentle levels (`*NormalPct` fields are the Default level) for throttle, brake and steering (Sport wins), steering ease-in, speed-sensitive steering, lean pairing fix, cruise PI controller, cancel rules, event queue, speed limiter (the cruise controller as a throttle cap, with look-ahead, kickdown and a ramp down; mutually exclusive with cruise, kept by `reset(keepLimiter)`). |
+| `src/core/DriveController.*` | Pure logic: Default/Sport/Gentle levels (`*NormalPct` fields are the Default level) for throttle, brake and steering (Sport wins), steering ease-in (steer-in time per mode), speed-sensitive steering, lean pairing fix, cruise PI controller, cancel rules, event queue, speed limiter (the cruise controller as a throttle cap, with look-ahead, kickdown and a ramp down; mutually exclusive with cruise, kept by `reset(keepLimiter)`). |
 | `src/core/MathUtil.h` | Small math helpers and unit conversions. |
 | `src/plugin/Main.cpp` | RED4ext `Main`/`Query`/`Supports`. Registers natives, adds `scripts` to redscript compilation (relative to the DLL), attaches the hook. Runtime is 2.5 only. |
 | `src/plugin/VehicleHook.*` | Detour on `vehicle::BaseObject::UpdateVehicleCameraInput` (hash `501486464`). |

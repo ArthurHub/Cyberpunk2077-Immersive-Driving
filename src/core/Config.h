@@ -37,7 +37,10 @@ namespace immersive_driving
 
         // Advanced steering
         bool steeringSmoothing = true;
-        float steerRiseSec = 0.3f;
+        // Steer-in time for each mode, like the levels above: normal, Sport and Gentle.
+        float steerRiseNormalSec = 0.3f;
+        float steerRiseSportSec = 0.3f;
+        float steerRiseGentleSec = 0.3f;
         bool speedSensitiveSteering = true;
         float fullSteerBelowKmh = 40.0f;
         float highSpeedKmh = 140.0f;

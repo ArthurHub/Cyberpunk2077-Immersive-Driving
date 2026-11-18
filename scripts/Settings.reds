@@ -256,13 +256,35 @@ public class ImmersiveDrivingSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Advanced Steering")
   @runtimeProperty("ModSettings.category.order", "2")
-  @runtimeProperty("ModSettings.displayName", "Steer-in time (s)")
-  @runtimeProperty("ModSettings.description", "Seconds to reach the steering level while holding a direction.")
+  @runtimeProperty("ModSettings.displayName", "Default steer-in time (s)")
+  @runtimeProperty("ModSettings.description", "Seconds to reach the steering level while holding a direction, with neither Sport nor Gentle mode active.")
   @runtimeProperty("ModSettings.min", "0.0")
   @runtimeProperty("ModSettings.max", "2.0")
   @runtimeProperty("ModSettings.step", "0.05")
   @runtimeProperty("ModSettings.dependency", "steeringSmoothing")
-  public let steerRiseSec: Float = 0.3;
+  public let steerRiseNormalSec: Float = 0.3;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Advanced Steering")
+  @runtimeProperty("ModSettings.category.order", "2")
+  @runtimeProperty("ModSettings.displayName", "Sport steer-in time (s)")
+  @runtimeProperty("ModSettings.description", "Seconds to reach the steering level while holding a direction in Sport mode.")
+  @runtimeProperty("ModSettings.min", "0.0")
+  @runtimeProperty("ModSettings.max", "2.0")
+  @runtimeProperty("ModSettings.step", "0.05")
+  @runtimeProperty("ModSettings.dependency", "steeringSmoothing")
+  public let steerRiseSportSec: Float = 0.3;
+
+  @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
+  @runtimeProperty("ModSettings.category", "Advanced Steering")
+  @runtimeProperty("ModSettings.category.order", "2")
+  @runtimeProperty("ModSettings.displayName", "Gentle steer-in time (s)")
+  @runtimeProperty("ModSettings.description", "Seconds to reach the steering level while holding a direction in Gentle mode.")
+  @runtimeProperty("ModSettings.min", "0.0")
+  @runtimeProperty("ModSettings.max", "2.0")
+  @runtimeProperty("ModSettings.step", "0.05")
+  @runtimeProperty("ModSettings.dependency", "steeringSmoothing")
+  public let steerRiseGentleSec: Float = 0.3;
 
   @runtimeProperty("ModSettings.mod", "Drive Modes and Cruise Control")
   @runtimeProperty("ModSettings.category", "Advanced Steering")
@@ -590,7 +612,9 @@ public class ImmersiveDrivingSettings extends IScriptable {
     ImmersiveDriving_SetInt(n"steerGentlePct", this.steerGentlePct);
 
     ImmersiveDriving_SetBool(n"steeringSmoothing", this.steeringSmoothing);
-    ImmersiveDriving_SetFloat(n"steerRiseSec", this.steerRiseSec);
+    ImmersiveDriving_SetFloat(n"steerRiseNormalSec", this.steerRiseNormalSec);
+    ImmersiveDriving_SetFloat(n"steerRiseSportSec", this.steerRiseSportSec);
+    ImmersiveDriving_SetFloat(n"steerRiseGentleSec", this.steerRiseGentleSec);
     ImmersiveDriving_SetBool(n"speedSensitiveSteering", this.speedSensitiveSteering);
     ImmersiveDriving_SetFloat(n"fullSteerBelowKmh", this.fullSteerBelowKmh);
     ImmersiveDriving_SetFloat(n"highSpeedKmh", this.highSpeedKmh);

@@ -51,7 +51,9 @@ namespace immersive_driving
         };
 
         constexpr FloatField FLOAT_FIELDS[] = {
-            { "steerRiseSec", &Config::steerRiseSec, 0.0f, 5.0f },
+            { "steerRiseNormalSec", &Config::steerRiseNormalSec, 0.0f, 5.0f },
+            { "steerRiseSportSec", &Config::steerRiseSportSec, 0.0f, 5.0f },
+            { "steerRiseGentleSec", &Config::steerRiseGentleSec, 0.0f, 5.0f },
             { "fullSteerBelowKmh", &Config::fullSteerBelowKmh, 0.0f, 300.0f },
             { "highSpeedKmh", &Config::highSpeedKmh, 10.0f, 400.0f },
             { "cruiseMinKmh", &Config::cruiseMinKmh, 1.0f, 200.0f },

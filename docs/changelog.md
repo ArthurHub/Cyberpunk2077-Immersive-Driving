@@ -1,6 +1,7 @@
 ## v1.6
 
 - Drive Modes: New *Cycle* setting for the Sport and Gentle Mode keys, so one key covers both modes. On the Sport key, each press steps to Sport, then Gentle, then back to Default (the Gentle key starts with Gentle).
+- Steering: Steer-in time is now set per mode (Default, Sport and Gentle) in Advanced Steering, so a mode can build up steering faster or slower while keeping its full steering level. A changed steer-in time is back to 0.3 s.
 
 ## v1.5
 

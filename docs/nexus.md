@@ -30,7 +30,7 @@ Everything is configurable in-game, with changes applied immediately, even while
 
 Active modes and speed controls appear alongside the game's driving hints, including the key to switch them off.
 
-[b]Controller tip:[/b] Set Default to Gentle values and bind Sport to D-pad Up. This gives you Gentle-like driving normally and Sport with just one button. D-pad Left also works for tap bindings, but holding it opens CrystalCoat. If you enable steering adjustments for controllers, use 100% steering in all modes and 0s steering time to avoid stiff analog steering.[/size]
+[b]Controller tip:[/b] Set Default to Gentle values and bind Sport to D-pad Up. This gives you Gentle-like driving normally and Sport with just one button. D-pad Left also works for tap bindings, but holding it opens CrystalCoat. If you enable steering adjustments for controllers, use 100% steering and 0 s steer-in time in all modes to avoid stiff analog steering.[/size]
 
 [size=4][b]Features[/b][/size]
 
@@ -64,6 +64,7 @@ Three independently configurable driving modes, each with adjustable throttle, b
 
 [list]
 [*][size=3][b]Smooth steering:[/b] Steering builds up while a direction is held, making short taps useful for small corrections. Releasing the key is always instant.[/size]
+[*][size=3][b]Steer-in time per mode:[/b] Set how quickly steering builds up separately for Default, Sport and Gentle, for example a quick full lock in Sport and slow, smooth turns in Gentle.[/size]
 [*][size=3][b]Speed-sensitive steering:[/b] Reduces Default and Gentle steering at higher speeds for more stable lane changes and highway curves.[/size]
 [*][size=3]Prevents the game's lean controls from interfering with steering when Sport or Gentle uses Left Shift or Left Ctrl.[/size]
 [/list]

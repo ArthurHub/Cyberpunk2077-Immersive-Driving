@@ -89,7 +89,7 @@ Whether the Sport and Gentle keys are held, toggled, or both is set by *Sport Mo
 
 ## Steering
 
-- **Smooth steering** (on by default) builds steering up while you hold left or right, reaching the level of the current mode in the **steer-in time** (0.3 s). Short taps make small corrections. Letting go, easing off, and changing direction are always instant.
+- **Smooth steering** (on by default) builds steering up while you hold left or right, reaching the level of the current mode in that mode's **steer-in time** (0.3 s for each mode). Short taps make small corrections. Letting go, easing off, and changing direction are always instant. Give Sport a shorter time for quick full lock, or Gentle a longer one for slow, smooth turns.
 - **Speed-sensitive steering** (on by default) gradually reduces Default and Gentle steering at speed, for stable lane changes and long highway curves. Below 40 km/h steering is never reduced, and at 140 km/h and above it is 65% of the mode's level. Sport steering is never reduced.
 
 All speeds in these settings are true speeds in km/h (40 km/h is about 25 mph, 140 km/h about 87 mph).
@@ -199,7 +199,9 @@ All nine are a percentage of the vanilla input, see [Drive Modes](#drive-modes).
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | Smooth steering | On | Steering builds up while holding a direction. |
-| Steer-in time | 0.3 s | Time to reach the steering level. |
+| Default steer-in time | 0.3 s | Time to reach the Default steering level. |
+| Sport steer-in time | 0.3 s | Time to reach the Sport steering level. |
+| Gentle steer-in time | 0.3 s | Time to reach the Gentle steering level. |
 | Speed-sensitive steering | On | Less Default and Gentle steering at high speed. |
 | Full steering below | 40 km/h | Below this true speed steering is never reduced. |
 | High speed | 140 km/h | True speed at which steering reaches its high speed level. |

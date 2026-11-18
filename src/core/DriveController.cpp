@@ -47,11 +47,20 @@ namespace immersive_driving
         constexpr float KICKDOWN_HOLD_SEC = 0.3f;
 
         /**
-         * The level for the active key: Sport wins over Gentle.
+         * The value for the active mode: Sport wins over Gentle.
+         */
+        template <typename T>
+        T forMode(const TickContext& context, const T normal, const T sport, const T gentle) noexcept
+        {
+            return context.sport ? sport : (context.gentle ? gentle : normal);
+        }
+
+        /**
+         * The level for the active mode, as a fraction.
          */
         float levelFor(const TickContext& context, const int normalPct, const int sportPct, const int gentlePct) noexcept
         {
-            return percentToFraction(context.sport ? sportPct : (context.gentle ? gentlePct : normalPct));
+            return percentToFraction(forMode(context, normalPct, sportPct, gentlePct));
         }
 
         bool isKindEnabled(const Config& config, const VehicleKind kind) noexcept
@@ -149,13 +158,15 @@ namespace immersive_driving
         }
 
         // Only turning further in is smoothed. Letting go, easing off and changing direction follow the keys at once.
+        // The active mode's steer-in time sets the rate each tick, so a mode change mid-turn continues at the new rate.
         if (target * _steer < 0.0f) {
             _steer = 0.0f;
         }
         if (std::fabs(target) <= std::fabs(_steer)) {
             _steer = target;
         } else {
-            _steer = moveTowards(_steer, target, rateFor(std::max(std::fabs(target), MIN_RAMP_SPAN), config.steerRiseSec) * deltaTime);
+            const float riseSec = forMode(context, config.steerRiseNormalSec, config.steerRiseSportSec, config.steerRiseGentleSec);
+            _steer = moveTowards(_steer, target, rateFor(std::max(std::fabs(target), MIN_RAMP_SPAN), riseSec) * deltaTime);
         }
         return _steer;
     }
