@@ -12,13 +12,13 @@ namespace immersive_driving
         struct BoolField
         {
             std::string_view name;
-            bool Config::*member;
+            bool Config::* member;
         };
 
         struct FloatField
         {
             std::string_view name;
-            float Config::*member;
+            float Config::* member;
             float min;
             float max;
         };
@@ -26,7 +26,7 @@ namespace immersive_driving
         struct IntField
         {
             std::string_view name;
-            int Config::*member;
+            int Config::* member;
             int min;
             int max;
         };
